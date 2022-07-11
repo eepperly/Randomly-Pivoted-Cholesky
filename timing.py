@@ -27,12 +27,12 @@ A = gallery.kernel_from_data(np.random.randn(n,d), kernel="laplace")
 
 num_trials = 1
 
-methods = { 'RRLS' : leverage_score.recursive_rls_acc,
+methods = { 'RLS' : leverage_score.recursive_rls_acc,
             'Uniform' : unif_sample.uniform_sample,
             'RPCholesky' : rp_cholesky.rp_cholesky,
             'Greedy' : rp_cholesky.greedy,
             'BlockRPCholesky' : rp_cholesky.block_rp_cholesky,
-            'DPP_vfx' : dpp_lra.dpp_vfx }
+            'DPP' : dpp_lra.dpp_vfx }
 
 for name, method in methods.items():
     print(name)

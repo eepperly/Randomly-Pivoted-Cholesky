@@ -6,7 +6,9 @@ from lra import NystromExtension
 def lra_from_sample(A, sample):
     F = A[:,sample]
     C = F[sample,:]
-    return NystromExtension(F, C)
+    Lc = np.linalg.cholesky(C+100*C.max()*np.finfo(float).eps*np.identity(k))
+    factor = solve_triangular(Lc, F.T,lower=True).T     
+    return NystromExtension(F, C, factor=factor, idx = sample, rows = F.T)
 
 def approximation_error(A, lra):
     return A.trace() - lra.trace()

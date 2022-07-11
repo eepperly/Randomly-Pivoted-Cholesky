@@ -4,7 +4,6 @@ import numpy as np
 from recursive_nystrom import recursiveNystrom
 from bless import bless, get_nystrom_embeddings
 from utils import lra_from_sample, MatrixWrapper
-from scipy.linalg import solve_triangular
 
 class RecursiveNystromWrapper(object):
 

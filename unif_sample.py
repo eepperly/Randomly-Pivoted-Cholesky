@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
-import random
-from lra import NystromExtension 
-from scipy.linalg import solve_triangular
+from utils import lra_from_sample
 
 def uniform_sample(A, k):
     n = A.shape[0]

@@ -2,7 +2,7 @@
 
 import numpy as np
 from scipy.special import gamma, kv
-from sklearn.metrics.pairwise import euclidean_distances
+from sklearn.metrics.pairwise import euclidean_distances, manhattan_distances
 
 def LaplaceKernel(x,y,bandwidth=1.0):
     # for single x,y in R^d

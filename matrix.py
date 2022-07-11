@@ -4,7 +4,6 @@ import numpy as np
 from abc import ABC, abstractmethod
 import numbers
 from kernels import MaternKernel, MaternKernel_vec, MaternKernel_mtx, GaussianKernel, GaussianKernel_vec, GaussianKernel_mtx, LaplaceKernel, LaplaceKernel_vec, LaplaceKernel_mtx
-from sklearn.metrics.pairwise import euclidean_distances, manhattan_distances
 from functools import partial
 
 class AbstractPSDMatrix(ABC):

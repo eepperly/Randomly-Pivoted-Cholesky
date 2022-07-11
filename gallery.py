@@ -44,3 +44,10 @@ def outliers(N, num_outliers = 50):
     X = 0.5*np.random.randn(N, 20)/np.sqrt(20.0)
     X[np.random.choice(range(N), size = num_outliers, replace = False),:] += 100.0 * np.random.randn(num_outliers, 20)
     return KernelMatrix(X)
+
+def kernel_from_data(data, **kwargs):
+    mean = np.mean(data, axis=0)
+    stddev = 0.0
+    for i in range(data.shape[0]):
+        stddev += np.linalg.norm(data[i,:] - mean)**2
+    return KernelMatrix(data, bandwidth = np.sqrt(stddev / data.shape[0]), **kwargs)

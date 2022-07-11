@@ -5,7 +5,8 @@ import random
 from lra import NystromExtension 
 from scipy.linalg import solve_triangular
 
-def uniform_sample(A, n, k):
+def uniform_sample(A, k):
+    n = A.shape[0]
     sample = np.random.choice(range(n), k, False)
     F = A[:,sample]
     C = F[sample,:]

@@ -3,7 +3,8 @@
 import numpy as np
 from lra import PSDLowRank
 
-def cholesky_helper(A, n, k, alg):
+def cholesky_helper(A, k, alg):
+    n = A.shape[0]
     diags = A.diag()
     
     # row ordering, is much faster for large scale problems
@@ -29,8 +30,9 @@ def cholesky_helper(A, n, k, alg):
 
     return PSDLowRank(F.T, idx = arr_idx, cols = rows)
 
-def block_cholesky_helper(A, n, k, b, alg):
+def block_cholesky_helper(A, k, b, alg):
     diags = A.diag()
+    n = A.shape[0]
     
     # row ordering
     F = np.zeros((k,n))
@@ -66,14 +68,14 @@ def block_cholesky_helper(A, n, k, b, alg):
 
     return PSDLowRank(F.T, idx = arr_idx, rows = rows)
 
-def rp_cholesky(A, n, k):
-    return cholesky_helper(A, n, k, 'rp')
+def rp_cholesky(A, k):
+    return cholesky_helper(A, k, 'rp')
 
-def greedy(A, n, k):
-    return cholesky_helper(A, n, k, 'greedy')
+def greedy(A, k):
+    return cholesky_helper(A, k, 'greedy')
 
-def block_rp_cholesky(A, n, k, b = 100):
-    return block_cholesky_helper(A, n, k, b, 'rp')
+def block_rp_cholesky(A, k, b = 100):
+    return block_cholesky_helper(A, k, b, 'rp')
 
-def block_greedy(A, n, k, b = 100):
-    return block_cholesky_helper(A, n, k, b, 'greedy')
+def block_greedy(A, k, b = 100):
+    return block_cholesky_helper(A, k, b, 'greedy')

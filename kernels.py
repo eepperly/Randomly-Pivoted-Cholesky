@@ -4,32 +4,32 @@ import numpy as np
 from scipy.special import gamma, kv
 from sklearn.metrics.pairwise import euclidean_distances
 
-def LaplaceKernel(x,y):
+def LaplaceKernel(x,y,bandwidth=1.0):
     # for single x,y in R^d
     return np.exp( -np.linalg.norm(x-y, ord=1) / bandwidth )
 
-def LaplaceKernel_vec(vec_x,vec_y):
+def LaplaceKernel_vec(vec_x,vec_y,bandwidth=1.0):
     # for vec_x, vec_y in R^{n*d}, return n values
     dsts = np.linalg.norm(vec_x-vec_y, ord = 1, axis = -1)
     return np.exp(-dsts/bandwidth)
 
-def LaplaceKernel_mtx(xx,yy):
+def LaplaceKernel_mtx(xx,yy,bandwidth=1.0):
     # xx in R^{nx*d} and yy in R^{ny*d} are both collection of points (two axis)
     # return nx*ny values
     # dsts = np.linalg.norm(xx[:, None, :] - yy[None, :, :], axis=-1)
     dsts = manhattan_distances(xx,yy) # faster
     return np.exp(-dsts/bandwidth)
 
-def GaussianKernel(x,y):
+def GaussianKernel(x,y,bandwidth=1.0):
 # for single x,y in R^d
     return np.exp(-0.5*np.linalg.norm(x-y)**2/bandwidth**2)
 
-def GaussianKernel_vec(vec_x,vec_y):
+def GaussianKernel_vec(vec_x,vec_y, bandwidth=1.0):
     # for vec_x, vec_y in R^{n*d}, return n values
     dsts = np.linalg.norm(vec_x-vec_y, axis = -1)**2
     return np.exp(-0.5*dsts**2/bandwidth**2)
 
-def GaussianKernel_mtx(xx,yy):
+def GaussianKernel_mtx(xx,yy,bandwidth=1.0):
     # xx in R^{nx*d} and yy in R^{ny*d} are both collection of points (two axis)
     # return nx*ny values
     # dsts = np.linalg.norm(xx[:, None, :] - yy[None, :, :], axis=-1)

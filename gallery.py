@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
-from matrix import PSDMatrix, KernelMatrix, HouseholderConjugatedDiagonal
+from matrix import PSDMatrix, KernelMatrix
 import itertools
 import scipy.io
 

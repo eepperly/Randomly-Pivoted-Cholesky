@@ -126,11 +126,11 @@ class KernelMatrix(FunctionMatrix):
     def kernel_from_input(kernel, bandwidth = 1.0, **kwargs):
         if isinstance(kernel, str):
             if kernel == 'gaussian':
-                return GaussianKernel, GaussianKernel_vec, GaussianKernel_mtx            
+                return partial(GaussianKernel,bandwidth=bandwidth), partial(GaussianKernel_vec, bandwidth=bandwidth), partial(GaussianKernel_mtx, bandwidth=bandwidth)
             elif kernel == 'matern':
                 return partial(MaternKernel,bandwidth=bandwidth,nu=kwargs["nu"]), partial(MaternKernel_vec,bandwidth=bandwidth,nu=kwargs["nu"]), partial(MaternKernel_mtx,bandwidth=bandwidth,nu=kwargs["nu"])
             elif kernel == 'laplace':
-                return LaplaceKernel, LaplaceKernel_vec, LaplaceKernel_mtx
+                return partial(LaplaceKernel,bandwidth=bandwidth), partial(LaplaceKernel_vec, bandwidth=bandwidth), partial(LaplaceKernel_mtx, bandwidth=bandwidth)
                 
             else:
                 raise RuntimeError("Kernel name {} not recognized".format(kernel))

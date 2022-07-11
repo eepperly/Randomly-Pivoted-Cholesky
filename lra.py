@@ -120,4 +120,4 @@ class NystromExtension(AbstractPSDLowRank):
         return self.F@np.linalg.solve(self.C,self.F.T)
     
     def eigenvalue_decomposition(self):
-        return CompactEigenvalueDecomposition.from_F(self.get_factor(), self.idx = idx, self.rows = rows)
+        return CompactEigenvalueDecomposition.from_F(self.get_factor(), idx = self.idx, rows = self.rows)

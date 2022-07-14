@@ -26,5 +26,6 @@ then
     rm 3195389
 fi
 
-# Data folder
+# Data and figure folder
 mkdir -p data
+mkdir -p figs

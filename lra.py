@@ -92,6 +92,9 @@ class PSDLowRank(AbstractPSDLowRank):
     def eigenvalue_decomposition(self):
         return CompactEigenvalueDecomposition.from_F(self.F, idx = self.idx, rows = self.rows)
 
+    def scale(self, scaling):
+        return PSDLowRank(scaling[:,np.newaxis] * self.F, idx = self.idx)
+
 class NystromExtension(AbstractPSDLowRank):
 
     def __init__(self, F, C, factor = None, **kwargs):
@@ -121,3 +124,6 @@ class NystromExtension(AbstractPSDLowRank):
     
     def eigenvalue_decomposition(self):
         return CompactEigenvalueDecomposition.from_F(self.get_factor(), idx = self.idx, rows = self.rows)
+
+    def scale(self, scaling):
+        return NystromExtension(scaling[:,np.newaxis] * self.F, self.C, idx = self.idx)

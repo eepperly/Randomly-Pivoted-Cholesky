@@ -3,7 +3,8 @@
 '''
 Code to show the selected landmarks for different Nystrom
 methods, using the 'Smile' and 'Outliers' test matrices.
- This code was used to produce Figure 1 in the manuscript
+This code was used to produce Figure 1 in the manuscript
+together with 'matlab_plotting/make_chosen_plots.m'
 '''
 
 import numpy as np

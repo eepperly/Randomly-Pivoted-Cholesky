@@ -7,6 +7,7 @@ the claim in the manuscrip that uniform sampling has an
 18x higher SMAPE than RPCholesky on the largest molecules
 in the QM9 dataset was based. To use this code, the 
 QM9 dataset must first be stored in 'data/homo.mat'
+as is done by qm9_krr.py
 '''
 
 import scipy.io

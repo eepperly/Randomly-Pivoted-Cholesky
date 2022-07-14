@@ -5,7 +5,8 @@ Code to perform KRR on the QM9 dataset using different
 Nystrom methods, using 100k randomly selected molecules
 as training points. The l1 Laplace kernel is used with
 a bandwidth 5120, and the regularization parameter is
-1e-8; both were chosen using cross-validation
+1e-8; both were chosen using cross-validation. This code
+was used to produce Figure 3 in the manuscript
 '''
 
 import qml, os

@@ -4,7 +4,7 @@
 Code to test the number of entry evaluations required for 
 different Nystrom methods, using the 'Smile' and 'Outliers'
 test matrices This code was used to produce Figure 2 in the
-manuscript
+manuscript together with 'matlab_plotting/make_entry_plots.m'
 '''
 
 import numpy as np
@@ -13,7 +13,7 @@ import gallery
 import scipy
 
 n = 10000
-num_trials = 100
+num_trials = 10
 ks = range(0, 120, 20)
 
 matrices = { "smile" : gallery.smile(n, bandwidth = 2.0),

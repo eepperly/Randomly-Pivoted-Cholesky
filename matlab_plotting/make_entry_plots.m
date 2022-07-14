@@ -11,7 +11,7 @@ for l = 1:2
         load(sprintf('../data/%s_%s_queries.mat', names{l}, method_name));
         queries = queries / 10000;
 
-        if strcmp(method_name, 'DPP') || strcmp(method_name, 'RRLS')
+        if strcmp(method_name, 'DPP') || strcmp(method_name, 'RLS')
             errorbar(ks, mean(queries, 2) ./ ks', std(queries, 1, 2) ./ ks',...
                 specs{j}, 'LineWidth', 2')
         else

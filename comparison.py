@@ -4,6 +4,7 @@
 Code to test the approximation error of different Nystrom
 methods, using the 'Smile' and 'Outliers' test matrices.
  This code was used to produce Figure 1 in the manuscript
+ together with 'matlab_plotting/make_comparison_plots.m'
 '''
 
 import numpy as np
@@ -50,5 +51,5 @@ for matrix_name, A in As.items():
                 break
 
         output = {"trace_norm_errors" : trace_norm_errors, "spectral_norm_errors" : spectral_norm_errors}
-        scipy.io.savemat("{}_{}.mat".format(matrix_name, name), output)
+        scipy.io.savemat("data/{}_{}.mat".format(matrix_name, name), output)
                 

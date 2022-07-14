@@ -6,7 +6,8 @@ Nystrom methods, using 100k randomly selected molecules
 as training points. The l1 Laplace kernel is used with
 a bandwidth 5120, and the regularization parameter is
 1e-8; both were chosen using cross-validation. This code
-was used to produce Figure 3 in the manuscript
+was used to produce Figure 3 in the manuscript together
+with 'matlab_plotting/make_krr_plots.m'
 '''
 
 import qml, os

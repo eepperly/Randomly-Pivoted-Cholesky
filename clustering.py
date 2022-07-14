@@ -3,7 +3,8 @@
 '''
 Code to test clustering by Nystrom-acclerated
 kernel spectral clustering. This code was used
-to produce Figure 4 in the manuscript
+to produce Figure 4 in the manuscript together
+with 'matlab_plotting/make_clustering_plots.m'
 '''
 
 # import libraries

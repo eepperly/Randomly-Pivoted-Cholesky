@@ -29,8 +29,8 @@ ks = range(20,220,20)
 num_trials = 100
 
 methods = { 'DPP' : dpp_cubic,
-            'DPCholesky' : greedy,
-            'RRLS' : recursive_rls_acc,
+            'Greedy' : greedy,
+            'RLS' : recursive_rls_acc,
             'Uniform' : uniform_sample,
             'RPCholesky' : rp_cholesky }
 

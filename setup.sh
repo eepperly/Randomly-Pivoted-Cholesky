@@ -23,6 +23,7 @@ then
     cd molecules
     mv ../3195389 .
     tar -xvf 3195389
+    rm 3195389
 fi
 
 # Data folder

@@ -28,7 +28,7 @@ def cholesky_helper(A, k, alg):
         diags -= F[i,:]**2
         diags = diags.clip(min = 0)
 
-    return PSDLowRank(F.T, idx = arr_idx, cols = rows)
+    return PSDLowRank(F.T, idx = arr_idx, rows = rows)
 
 def block_cholesky_helper(A, k, b, alg):
     diags = A.diag()

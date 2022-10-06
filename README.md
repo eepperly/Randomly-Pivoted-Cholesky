@@ -1,6 +1,13 @@
 # Randomly Pivoted Cholesky
 
-This contains code to reproduce the numerical experiments for _Randomly pivoted Cholesky: Practical approximation of a kernel matrix with few entry evaluations_ by Yifan Chen, Ethan N. Epperly, Joel A. Tropp, and Robert J. Webber.
+This contains code to reproduce the numerical experiments for [_Randomly pivoted Cholesky: Practical approximation of a kernel matrix with few entry evaluations_](https://arxiv.org/abs/2207.06503) by [Yifan Chen](https://yifanc96.github.io), [Ethan N. Epperly](https://www.ethanepperly.com), [Joel A. Tropp](https://tropp.caltech.edu), and [Robert J. Webber](https://rwebber.people.caltech.edu).
+
+## Algorithm
+
+Randomly pivoted Cholesky (RPCholesky) computes a low-rank approximation to a positive semidefinite matrix $\boldsymbol{A}$.
+We anticipate the algorithm is most useful for [kernel](https://en.wikipedia.org/wiki/Kernel_method) and [Gaussian process](https://en.wikipedia.org/wiki/Kriging) methods, where the matrix $\boldsymbol{A}$ is defined only implicitly by a [_kernel function_](https://en.wikipedia.org/wiki/Positive-definite_kernel) which must be evaluated at great expense to read each entry of $\boldsymbol{A}$.
+The result of the algorithm is a rank $k$ [(column) Nyström approximation](https://en.wikipedia.org/wiki/Low-rank_matrix_approximations#Nyström_approximation) $\boldsymbol{\hat{A}} = \boldsymbol{F}\boldsymbol{F}^*$ to the matrix $\boldsymbol{A}$, computed in $\mathcal{O}(k^2N)$ operations and only $(k+1)N$ entry evaluations of the matrix $\boldsymbol{A}$.
+In our experience, RPCholesky consistently provides approximations of comparable accuracy to [other](https://proceedings.neurips.cc/paper/2017/hash/a03fa30821986dff10fc66647c84c9c3-Abstract.html) [methods](https://jmlr.org/papers/v20/19-179.html) with fewer entry evaluations.
 
 ## Running the experiments
 

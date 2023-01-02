@@ -51,9 +51,7 @@ class KRR_Nystrom():
         if solve_method == 'Direct':
             KMM = KMn[:,arr_idx]
             KnM = KMn.T
-            self.sol = scipy.linalg.solve(KMn @ KnM + KnM.shape[0]*lamb*KMM + 100*KMM.max()*np.finfo(float).eps*np.identity(sample_num), KMn @ Ytr, assume_a='pos')
-            
-ite) for i in range(np.shape(Ytr)[1])])
+            self.sol = scipy.linalg.solve(KMn
         te = time.time()
         self.linsolve_time = te - ts
         

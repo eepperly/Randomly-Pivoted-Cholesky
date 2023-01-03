@@ -24,6 +24,7 @@ then
     mv ../3195389 .
     tar -xvf 3195389
     rm 3195389
+    cd ..
 fi
 
 # Data and figure folder

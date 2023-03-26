@@ -19,7 +19,7 @@ from scipy.io import savemat
 from matrix import KernelMatrix
 from sklearn.cluster import KMeans
 from sklearn.metrics import normalized_mutual_info_score
-from clustering_plot import get_image_data
+from cluster_letters_plot import get_image_data
 
 _, _, X, K = get_image_data()
 true_labels = np.zeros(X.shape[0], dtype=int)

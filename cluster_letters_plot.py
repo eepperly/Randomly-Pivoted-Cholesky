@@ -5,7 +5,8 @@ Code to show clustering for produced by Nystrom-
 acclerated kernel spectral clustering. To use,
 set 'method' to the desired Nystrom method and
 'k' to the desired number of pivots. This code
-was used to produce Figure 4 in the manuscript
+was used to produce Figure 4 in v1-v3 of the
+manuscript
 '''
 
 # import libraries

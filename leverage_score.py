@@ -16,7 +16,11 @@ class RecursiveNystromWrapper(object):
             to_return = self.A.diag(X)
             return np.reshape(to_return, (to_return.shape[0], 1))
         else:
-            return self.A[np.ix_(X.ravel(), Y.ravel())]
+            to_return = self.A[np.ix_(X.ravel(), Y.ravel())]
+            if len(to_return.shape) == 1:
+                return np.reshape(to_return, (to_return.shape[0], 1))
+            else:
+                return to_return
 
 def recursive_rls_helper(A, k, accelerated_flag):
     n = A.shape[0]

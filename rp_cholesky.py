@@ -18,7 +18,7 @@ def cholesky_helper(A, k, alg):
         if alg == 'rp':
             idx = rng.choice(range(n), p = diags / sum(diags))
         elif alg == 'greedy':
-            idx = np.argmax(diags)
+            idx = rng.choice(np.where(diags == np.max(diags))[0])
         else:
             raise RuntimeError("Algorithm '{}' not recognized".format(alg))
 

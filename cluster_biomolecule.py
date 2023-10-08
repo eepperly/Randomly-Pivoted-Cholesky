@@ -58,8 +58,9 @@ perms = np.array(list(permutations(np.arange(centers)))) # for later index permu
 
 sigma = .1
 k = 150
+rgreedy = lambda A, k: greedy(A, k, randomized_tiebreaking = True)
 methods = { 'RPCholesky' : rp_cholesky,
-            'Greedy' : greedy,
+            'Greedy' : rgreedy,
             'RLS' : recursive_rls_acc,
             'Uniform' : uniform_sample }
 A = KernelMatrix(data, bandwidth = sigma)

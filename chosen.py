@@ -20,7 +20,7 @@ k = 40
 
 # Add matrices
 As = { "smile" : gallery.smile(n, bandwidth = 2.0),
-       "outliers" : gallery.outliers(n) }
+       "spiral" : gallery.spiral(n) }
 
 methods = { 'RLS' : recursive_rls_acc,
             'Uniform' : uniform_sample,

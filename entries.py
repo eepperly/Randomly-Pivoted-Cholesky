@@ -13,11 +13,11 @@ import gallery
 import scipy
 
 n = 10000
-num_trials = 10
-ks = range(0, 120, 20)
+num_trials = 100
+ks = range(0, 160, 10)
 
 matrices = { "smile" : gallery.smile(n, bandwidth = 2.0),
-             "outliers" : gallery.outliers(n) }
+             "spiral" : gallery.spiral(n) }
 
 methods = { 'DPP' : dpp_lra.dpp_vfx,
             'RLS' : leverage_score.recursive_rls_acc,
@@ -40,11 +40,11 @@ for matrix_name, A in matrices.items():
                 for i in range(num_trials):
                     F = method(A, k)
                     queries[idx, i] = A.num_queries()
-                    A.reset_queries()
+                    A.reset()
                     print("     ", queries[idx,i] / (n*k))
             except ValueError:
                 print("    error!")
-                A.reset_queries()
+                A.reset()
                 queries[idx,:] = np.NaN
 
             output = {"queries" : queries}

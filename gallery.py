@@ -40,6 +40,16 @@ def smile(N, **kwargs):
 
     return KernelMatrix(X, **kwargs)    
 
+def spiral(N, max_radius = 1.0, angle = 0.2, decay_power = 1, bandwidth = 1e-3):
+    X = np.zeros((N, 2))
+    t = np.array(range(1,N+1), dtype=float)
+    radii = max_radius * t ** (-decay_power)
+    angles = angle * t
+    X[:,0] = radii * np.cos(angles)
+    X[:,1] = radii * np.sin(angles)
+    # np.random.shuffle(X)
+    return KernelMatrix(X, bandwidth = bandwidth)
+
 def outliers(N, num_outliers = 50):
     X = 0.5*np.random.randn(N, 20)/np.sqrt(20.0)
     X[np.random.choice(range(N), size = num_outliers, replace = False),:] += 100.0 * np.random.randn(num_outliers, 20)

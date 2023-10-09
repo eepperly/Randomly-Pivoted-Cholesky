@@ -10,24 +10,64 @@ was used to produce Figure 3 in the manuscript together
 with 'matlab_plotting/make_krr_plots.m'
 '''
 
-import qml, os
+import os
 from scipy.io import savemat, loadmat
 import numpy as np
+import fileinput, sys
 
-def get_molecules(directory = "molecules/", max_atoms = 29, max_mols = np.Inf, output_index = 9):
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+def fix_file(directory = "molecules/"):
+    print("File formatting is incorrect for ASE: fixing!")
+    os.chdir(directory)
+    file_number = 1
+    for line in fileinput.input(files = sorted(os.listdir(".")), inplace=True):
+        if fileinput.isfirstline():
+            eprint("File", file_number)
+            file_number += 1
+            numatoms = int(line.rstrip())
+            counter = 0
+            print(line.rstrip())
+        else:
+            if counter <= numatoms:
+                print(line.rstrip())
+                counter += 1
+            else:
+                fileinput.nextfile()
+    
+def get_molecules(directory = "molecules/", max_atoms = 29, max_mols = np.Inf, output_index = 9, featurization = "mbtr"):
     compounds = []
     energies = []
+
+    if featurization == "coloumb":
+        import qml
+    elif featurization == "mbtr":
+        import ase.io
+        from dscribe.descriptors import MBTR
+    
     for f in sorted(os.listdir("molecules/")):
         if len(compounds) >= max_mols:
             break
 
         try:
-            mol = qml.Compound(xyz="molecules/"+f)
-            mol.generate_coulomb_matrix(size=max_atoms, sorting="row-norm")
+            if featurization == "coloumb":
+                mol = qml.Compound(xyz="molecules/"+f)
+                mol.generate_coulomb_matrix(size=max_atoms, sorting="row-norm")
+            elif featurization == "mbtr":
+                mol = ase.io.read("molecules/"+f)
+            else:
+                raise RuntimeError("Featurization '{}' not recognized".format(featurization))
+            
             with open("molecules/"+f) as myfile:
                 line = list(myfile.readlines())[1]
                 energies.append(float(line.split()[output_index]) * 27.2114) # Hartrees to eV
             compounds.append(mol)
+
+        except ase.io.extxyz.XYZError:
+            fix_file(directory)
+            return get_molecules(directory = directory, max_atoms = max_atoms, max_mols = max_mols, output_index = output_index, featurization = featurization)
+            
         except ValueError:
             pass
 
@@ -35,7 +75,11 @@ def get_molecules(directory = "molecules/", max_atoms = 29, max_mols = np.Inf, o
     np.random.shuffle(c)
     compounds, energies = zip(*c)
 
-    X = np.array([mol.representation for mol in compounds])
+    if featurization == "coloumb":
+        X = np.array([mol.representation for mol in compounds])
+    elif featurization == "mbtr":
+        mbtr = MBTR(species=["C","H","O","N","F"],normalization="l2",geometry={"function": "inverse_distance"}, grid={"min": 0, "max": 1, "n": 100, "sigma": 0.1})
+        X = np.array([mbtr.create(mol) for mol in compounds])
     Y = np.array(energies).reshape((X.shape[0],1))
 
     return X, Y 
@@ -51,8 +95,8 @@ if __name__ == "__main__":
     feature = data['X']
     target = data['Y'].flatten()
     from sklearn.preprocessing import StandardScaler
-    scaler = StandardScaler()
-    feature = scaler.fit_transform(feature)
+    # scaler = StandardScaler()
+    # feature = scaler.fit_transform(feature)
     n,d = np.shape(feature)
     
     num_train = 100000
@@ -87,8 +131,9 @@ if __name__ == "__main__":
 
     num_trials = 100
     lamb = 1.0e-8
-    sigma = 5120.0
+    sigma = "median"
     result = dict()
+    kerneltype = "gaussian"
 
     solve_method = 'Direct'
 
@@ -101,6 +146,8 @@ if __name__ == "__main__":
         result[name]["KRRSMAPE"] = np.zeros((len(ks),2))
         result[name]["queriess"] = np.zeros((len(ks),2))
 
+        model = KRR_Nystrom(kernel = kerneltype, bandwidth = sigma)
+        
         for idx_k in range(len(ks)):
             k = ks[idx_k]
             print(f'k = {k}')
@@ -115,8 +162,7 @@ if __name__ == "__main__":
                     while True:
                         try:
                             print(f"Trial {i}")
-                            model = KRR_Nystrom(kernel = "gaussian", 
-                                    bandwidth = sigma)
+                            
                             model.fit_Nystrom(train_sample, train_sample_target, lamb = lamb, sample_num = k, sample_method = method, solve_method = solve_method)
                             preds = model.predict_Nystrom(test_sample)
                             break
@@ -132,8 +178,6 @@ if __name__ == "__main__":
                     print(f'time: sample {model.sample_time} s, linsolve {model.linsolve_time} s, pred {model.pred_time} s')
 
             else:
-                model = KRR_Nystrom(kernel = "laplace", 
-                            bandwidth = sigma)
                 model.fit_Nystrom(train_sample, train_sample_target, lamb = lamb, sample_num = k, sample_method = method, solve_method = solve_method)
                 preds = model.predict_Nystrom(test_sample)
                 KRRmse.append(mean_squared_error(test_sample_target, preds))

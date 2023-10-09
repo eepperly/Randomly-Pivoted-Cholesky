@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 import numbers
 from kernels import MaternKernel, MaternKernel_vec, MaternKernel_mtx, GaussianKernel, GaussianKernel_vec, GaussianKernel_mtx, LaplaceKernel, LaplaceKernel_vec, LaplaceKernel_mtx
 from functools import partial
+import itertools
 
 class AbstractPSDMatrix(ABC):
 
@@ -141,11 +142,14 @@ class KernelMatrix(FunctionMatrix):
     def __init__(self, X, kernel = "gaussian", bandwidth = 1.0, **kwargs):
         super().__init__(X.shape[0],**kwargs)
         self.data = X
+        if bandwidth == "median":
+            X_sub = X[np.random.choice(X.shape[0], min(X.shape[0],1000), False),:]
+            bandwidth = np.median([np.linalg.norm(X_sub[i,:] - X_sub[j,:]) for i,j in itertools.combinations(range(X_sub.shape[0]),2)])
+        self.bandwidth = bandwidth
         kernel, kernel_vec, kernel_mtx = KernelMatrix.kernel_from_input(kernel, bandwidth = bandwidth, **kwargs)
         self.kernel = kernel
         self.kernel_vec = kernel_vec
         self.kernel_mtx = kernel_mtx
-        
         
     def _function(self, i, j):
         return self.kernel(self.data[i,:], self.data[j,:])

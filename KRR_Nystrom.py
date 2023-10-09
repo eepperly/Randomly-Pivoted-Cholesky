@@ -12,14 +12,17 @@ class KRR_Nystrom():
                  bandwidth = 1):
         self.kernel = kernel
         self.bandwidth = bandwidth
+        self.Xtr = None
     
     def fit(self, Xtr, Ytr, lamb):
-        self.Xtr = Xtr
         ts = time.time()
-        self.K = KernelMatrix(Xtr, kernel = self.kernel, bandwidth = self.bandwidth)
+        if not np.array_equal(Xtr, self.Xtr):
+            self.K = KernelMatrix(Xtr, kernel = self.kernel, bandwidth = self.bandwidth)
+            self.bandwidth = self.K.bandwidth
         K_exact = self.K[:,:]
         self.sol = scipy.linalg.solve(K_exact+lamb*np.shape(K_exact)[0]*np.eye(np.shape(K_exact)[0]),Ytr, assume_a='pos')
         te = time.time()
+        self.Xtr = Xtr
         self.linsolve_time = te - ts
         
     def predict(self, Xts):
@@ -32,9 +35,10 @@ class KRR_Nystrom():
         return preds
     
     def fit_Nystrom(self, Xtr, Ytr, lamb, sample_num, sample_method, solve_method = 'Direct', ite = 400):
-        self.Xtr = Xtr
-        self.K = KernelMatrix(Xtr, kernel = self.kernel, bandwidth = self.bandwidth)
         ts = time.time()
+        if not np.array_equal(Xtr, self.Xtr):
+            self.K = KernelMatrix(Xtr, kernel = self.kernel, bandwidth = self.bandwidth)
+            self.bandwidth = self.K.bandwidth            
         lra = sample_method(self.K, sample_num)
         arr_idx = lra.idx
         KMn = lra.rows
@@ -54,6 +58,7 @@ class KRR_Nystrom():
             self.sol = scipy.linalg.solve(KMn @ KnM + KnM.shape[0]*lamb*KMM + 100*KMM.max()*np.finfo(float).eps*np.identity(sample_num), KMn @ Ytr, assume_a='pos')
         te = time.time()
         self.linsolve_time = te - ts
+        self.Xtr = Xtr
         
     def predict_Nystrom(self, Xts):
         ts = time.time()

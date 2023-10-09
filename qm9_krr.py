@@ -20,11 +20,12 @@ def eprint(*args, **kwargs):
 
 def fix_file(directory = "molecules/"):
     print("File formatting is incorrect for ASE: fixing!")
+    init_dir = os.getcwd()
     os.chdir(directory)
     file_number = 1
     for line in fileinput.input(files = sorted(os.listdir(".")), inplace=True):
         if fileinput.isfirstline():
-            eprint("File", file_number)
+            eprint("Fixed file", file_number)
             file_number += 1
             numatoms = int(line.rstrip())
             counter = 0
@@ -35,10 +36,13 @@ def fix_file(directory = "molecules/"):
                 counter += 1
             else:
                 fileinput.nextfile()
+    os.chdir(init_dir)
     
 def get_molecules(directory = "molecules/", max_atoms = 29, max_mols = np.Inf, output_index = 9, featurization = "mbtr"):
     compounds = []
     energies = []
+
+    print("Reading molecule data from folder {}".format(directory))
 
     if featurization == "coloumb":
         import qml

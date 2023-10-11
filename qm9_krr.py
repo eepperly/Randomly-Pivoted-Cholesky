@@ -14,7 +14,7 @@ import qml, os
 from scipy.io import savemat, loadmat
 import numpy as np
 
-def get_molecules(directory = "molecules/", max_atoms = 29, max_mols = np.Inf, output_index = 9):
+def get_molecules(directory = "molecules/", max_atoms = 29, max_mols = np.Inf, output_index = 7):
     compounds = []
     energies = []
     for f in sorted(os.listdir("molecules/")):
@@ -30,7 +30,7 @@ def get_molecules(directory = "molecules/", max_atoms = 29, max_mols = np.Inf, o
             compounds.append(mol)
         except ValueError:
             pass
-
+    
     c = list(zip(compounds, energies))
     np.random.shuffle(c)
     compounds, energies = zip(*c)
@@ -47,7 +47,7 @@ if __name__ == "__main__":
         savemat("data/homo.mat", data)
     else:
         data = loadmat("data/homo.mat")
-
+        
     feature = data['X']
     target = data['Y'].flatten()
     from sklearn.preprocessing import StandardScaler

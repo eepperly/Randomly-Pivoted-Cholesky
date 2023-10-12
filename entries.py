@@ -17,7 +17,7 @@ num_trials = 100
 ks = range(0, 160, 10)
 
 matrices = { "smile" : gallery.smile(n, bandwidth = 2.0),
-             "spiral" : gallery.spiral(n) }
+             "spiral" : gallery.robspiral(n) }
 
 methods = { 'DPP' : dpp_lra.dpp_vfx,
             'RLS' : leverage_score.recursive_rls_acc,

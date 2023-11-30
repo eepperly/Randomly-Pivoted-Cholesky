@@ -2,9 +2,10 @@
 
 '''
 Code to test clustering by Nystrom-acclerated
-kernel spectral clustering. This code was used
-to produce Figure 4 in the manuscript together
-with 'matlab_plotting/make_clustering_plots.m'
+kernel spectral clustering for clustering
+letters. This code was used to produce Figure 4
+in v1-v3 of the manuscript together with
+'matlab_plotting/make_clustering_plots.m'
 '''
 
 # import libraries
@@ -18,7 +19,7 @@ from scipy.io import savemat
 from matrix import KernelMatrix
 from sklearn.cluster import KMeans
 from sklearn.metrics import normalized_mutual_info_score
-from clustering_plot import get_image_data
+from cluster_letters_plot import get_image_data
 
 _, _, X, K = get_image_data()
 true_labels = np.zeros(X.shape[0], dtype=int)

@@ -2,6 +2,7 @@
 
 import numpy as np
 from lra import PSDLowRank
+from warnings import warn
 
 def cholesky_helper(A, k, alg):
     n = A.shape[0]
@@ -70,13 +71,21 @@ def block_cholesky_helper(A, k, b, alg):
 
     return PSDLowRank(F.T, idx = arr_idx, rows = rows)
 
-def rp_cholesky(A, k):
-    return cholesky_helper(A, k, 'rp')
+def rpcholesky(A, k, b = 1):
+    if b == 1:
+        return cholesky_helper(A, k, 'rp')
+    else:
+        return block_cholesky_helper(A, k, b, 'rp')
 
-def greedy(A, k, randomized_tiebreaking = False):
-    return cholesky_helper(A, k, 'rgreedy' if randomized_tiebreaking else 'greedy')
+def greedy(A, k, randomized_tiebreaking = False, b = 1):
+    if b == 1:
+        return cholesky_helper(A, k, 'rgreedy' if randomized_tiebreaking else 'greedy')
+    else:
+        if randomized_tiebreaking:
+            warn("Randomized tiebreaking not implemented for block greedy method")
+        return block_cholesky_helper(A, k, b, 'greedy')
 
-def block_rp_cholesky(A, k, b = 100):
+def block_rpcholesky(A, k, b = 100):
     return block_cholesky_helper(A, k, b, 'rp')
 
 def block_greedy(A, k, b = 100):

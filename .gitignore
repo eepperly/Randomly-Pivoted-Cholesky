@@ -5,3 +5,4 @@ data/
 bless.py
 recursive_nystrom.py
 *~
+*.npz

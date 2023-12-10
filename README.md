@@ -12,24 +12,24 @@ In our experience, RPCholesky consistently provides approximations of comparable
 ## Using RPCholesky
 
 While the main purpose of these scripts is for scientific reproducibility, they also may be useful for using RPCholesky in an application.
-RPCholesky is implemented in the `rp_cholesky` method in `rp_cholesky.py`, and can be called as
+RPCholesky is implemented in the `rpcholesky` method in `rpcholesky.py`, and can be called as
 
 ```
-nystrom_approximation = rp_cholesky(A, num_pivots)
+nystrom_approximation = rpcholesky(A, num_pivots)
 ```
 
 The input matrix `A` should be an `AbstractPSDMatrix` object, defined in `matrix.py`.
-A psd matrix stored as a `numpy` array can be made usable by `rp_cholesky` by wrapping it in a `PSDMatrix` object:
+A psd matrix stored as a `numpy` array can be made usable by `rpcholesky` by wrapping it in a `PSDMatrix` object:
 
 ```
-nystrom_approximation = rp_cholesky(PSDMatrix(ordinary_numpy_array), num_pivots)
+nystrom_approximation = rpcholesky(PSDMatrix(ordinary_numpy_array), num_pivots)
 ```
 
-The output of `rp_cholesky` is a `PSDLowRank` object (defined in `lra.py`).
+The output of `rpcholesky` is a `PSDLowRank` object (defined in `lra.py`).
 From this object, one can obtain $\boldsymbol{F}$ (defining the Nyström approximation $\boldsymbol{\hat{A}} = \boldsymbol{FF}^*$), the pivot set $\mathsf{S}$, and the rows defining the Nyström approximation $A(\mathsf{S},:)$:
 
 ```
-nystrom_approximation = rp_cholesky(A, num_pivots)
+nystrom_approximation = rpcholesky(A, num_pivots)
 F      = nystrom_approximation.F                    # Nystrom approximation is F @ F.T
 pivots = nystrom_approximation.idx 
 rows   = nystrom.rows                               # rows = A[pivots, :]

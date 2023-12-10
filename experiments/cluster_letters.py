@@ -15,7 +15,7 @@ sys.path.append('../')
 from dpp_lra import dpp_cubic
 from unif_sample import uniform_sample
 from leverage_score import recursive_rls_acc
-from rp_cholesky import rp_cholesky, greedy
+from rpcholesky import rpcholesky, greedy
 
 import numpy as np
 from scipy.io import savemat
@@ -37,7 +37,7 @@ methods = { 'DPP' : dpp_cubic,
             'Greedy' : greedy,
             'RLS' : recursive_rls_acc,
             'Uniform' : uniform_sample,
-            'RPCholesky' : rp_cholesky }
+            'RPCholesky' : rpcholesky }
 
 for name, method in methods.items():
     accuracies = np.zeros((len(ks), num_trials))

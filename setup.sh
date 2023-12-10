@@ -15,8 +15,12 @@ fi
 pip3 install qml
 pip3 install dppy
 
-# QM9 dataset
+# Data and figure folder
 cd experiments
+mkdir -p data
+mkdir -p figs
+
+# QM9 dataset
 if [ ! -d "molecules" ] 
 then
     wget https://figshare.com/ndownloader/files/3195389
@@ -31,8 +35,4 @@ fi
 # Alanine dipeptide
 wget http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-3x250ns-heavy-atom-positions.npz
 wget http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-3x250ns-backbone-dihedrals.npz
-
-# Data and figure folder
-mkdir -p data
-mkdir -p figs
 cd ..

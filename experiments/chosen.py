@@ -13,7 +13,7 @@ sys.path.append('../')
 import numpy as np
 import gallery
 import scipy
-from rp_cholesky import rp_cholesky, greedy
+from rpcholesky import rpcholesky, greedy
 from unif_sample import uniform_sample
 from leverage_score import recursive_rls_acc
 from utils import approximation_error
@@ -27,7 +27,7 @@ As = { "smile" : gallery.smile(n, bandwidth = 2.0),
 
 methods = { 'RLS' : recursive_rls_acc,
             'Uniform' : uniform_sample,
-            'RPCholesky' : rp_cholesky,
+            'RPCholesky' : rpcholesky,
             'Greedy' : greedy }
 
 for matrix_name, A in As.items():

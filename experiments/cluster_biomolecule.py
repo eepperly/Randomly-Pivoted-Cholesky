@@ -72,8 +72,8 @@ for name, method in methods.items():
     print(name)
     
     lra = method(A, k)
-    F = lra.F.T
-    idx = lra.idx
+    F = lra.get_right_factor()
+    idx = lra.get_indices()
     print("Low-rank approximation done!")
     
     # dense eigensolver
@@ -153,7 +153,7 @@ for name, method in methods.items():
 
             # dense eigensolver
             lra = method(A, k)
-            F = lra.F.T
+            F = lra.get_right_factor()
             normal = F.T @ (F @ np.ones(F.shape[1]))
             normal[normal > 0] = normal[normal > 0]**-.5
             F = F * normal[np.newaxis, :]

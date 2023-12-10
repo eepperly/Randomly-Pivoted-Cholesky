@@ -5,12 +5,9 @@ from lra import NystromExtension
 from scipy.linalg import solve_triangular
 
 def lra_from_sample(A, sample):
-    F = A[:,sample]
-    C = F[sample,:]
-    k = C.shape[0]
-    Lc = np.linalg.cholesky(C+100*C.max()*np.finfo(float).eps*np.identity(k))
-    factor = solve_triangular(Lc, F.T,lower=True).T     
-    return NystromExtension(F, C, factor=factor, idx = sample, rows = F.T)
+    rows = A[sample,:]
+    core = rows[:,sample]
+    return NystromExtension(core, rows = rows, idx = sample)
 
 def approximation_error(A, lra):
     return A.trace() - lra.trace()

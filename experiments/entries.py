@@ -7,6 +7,9 @@ test matrices This code was used to produce Figure 2 in the
 manuscript together with 'matlab_plotting/make_entry_plots.m'
 '''
 
+import sys
+sys.path.append('../')
+
 import numpy as np
 import dpp_lra, rp_cholesky, unif_sample, leverage_score
 import gallery

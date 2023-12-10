@@ -13,6 +13,9 @@ Ethan Epperly.
 # SETUP
 # =====
 
+import sys
+sys.path.append('../')
+
 # import libraries
 import matplotlib.pyplot as plt
 import numpy as np

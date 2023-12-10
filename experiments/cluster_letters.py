@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 Code to test clustering by Nystrom-acclerated
@@ -7,6 +7,9 @@ letters. This code was used to produce Figure 4
 in v1-v3 of the manuscript together with
 'matlab_plotting/make_clustering_plots.m'
 '''
+
+import sys
+sys.path.append('../')
 
 # import libraries
 from dpp_lra import dpp_cubic

@@ -2,7 +2,7 @@
 
 rm bless.py
 rm recursive_nystrom.py
-rm alanine*
-rm -rf molecules
-rm -rf data
-rm -rf figs
+rm experiments/alanine*
+rm -rf experiments/molecules
+rm -rf experiments/data
+rm -rf experiments/figs

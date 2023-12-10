@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 Code to perform KRR on the QM9 dataset using different
@@ -9,6 +9,9 @@ a bandwidth 5120, and the regularization parameter is
 was used to produce Figure 3 in the manuscript together
 with 'matlab_plotting/make_krr_plots.m'
 '''
+
+import sys
+sys.path.append('../')
 
 import qml, os
 from scipy.io import savemat, loadmat

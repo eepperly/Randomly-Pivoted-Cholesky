@@ -7,6 +7,9 @@ data, and the approximation rank can be set by changing
 n, d, and ks.
 '''
 
+import sys
+sys.path.append('../')
+
 import numpy as np
 import time as time
 import dpp_lra

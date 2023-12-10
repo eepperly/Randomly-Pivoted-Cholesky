@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 Code to show clustering for produced by Nystrom-
@@ -8,6 +8,9 @@ set 'method' to the desired Nystrom method and
 was used to produce Figure 4 in v1-v3 of the
 manuscript
 '''
+
+import sys
+sys.path.append('../')
 
 # import libraries
 from dpp_lra import dpp_cubic

@@ -7,6 +7,9 @@ methods, using the 'Smile' and 'Outliers' test matrices.
  together with 'matlab_plotting/make_comparison_plots.m'
 '''
 
+import sys
+sys.path.append('../')
+
 import numpy as np
 import dpp_lra, rp_cholesky, unif_sample, leverage_score
 from utils import approximation_error

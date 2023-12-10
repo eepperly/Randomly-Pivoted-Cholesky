@@ -10,6 +10,9 @@ QM9 dataset must first be stored in 'data/homo.mat'
 as is done by qm9_krr.py
 '''
 
+import sys
+sys.path.append('../')
+
 import scipy.io
 from scipy.io import savemat
 import numpy as np

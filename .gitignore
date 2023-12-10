@@ -1,7 +1,7 @@
 molecules/
 figs/
 data/
-__pycache__/
+*__pycache__/
 bless.py
 recursive_nystrom.py
 *~

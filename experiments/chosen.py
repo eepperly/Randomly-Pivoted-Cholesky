@@ -7,6 +7,9 @@ This code was used to produce Figure 1 in the manuscript
 together with 'matlab_plotting/make_chosen_plots.m'
 '''
 
+import sys
+sys.path.append('../')
+
 import numpy as np
 import gallery
 import scipy

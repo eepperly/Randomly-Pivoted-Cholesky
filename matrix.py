@@ -11,6 +11,7 @@ class AbstractPSDMatrix(ABC):
     def __init__(self, **kwargs):
         self.queries = 0
         self.count_queries = kwargs['count_queries'] if ('count_queries' in kwargs) else True
+        self.dpp_stuff = None
 
     @abstractmethod
     def _diag_helper(self, *args):
@@ -45,8 +46,9 @@ class AbstractPSDMatrix(ABC):
     def num_queries(self):
         return self.queries
 
-    def reset_queries(self):
+    def reset(self):
         self.queries = 0
+        self.dpp_stuff = None
 
     def to_matrix(self):
         return PSDMatrix(self[:,:])

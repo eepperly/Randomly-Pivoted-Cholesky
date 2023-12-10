@@ -46,7 +46,7 @@ class KRR_Nystrom():
         trK = self.K.trace()
         self.reltrace_err = (trK-lra.trace())/ trK
         
-        self.K.reset_queries()
+        self.K.reset()
         ts = time.time()
         if solve_method == 'Direct':
             KMM = KMn[:,arr_idx]

@@ -17,8 +17,10 @@ def cholesky_helper(A, k, alg):
     for i in range(k):
         if alg == 'rp':
             idx = rng.choice(range(n), p = diags / sum(diags))
-        elif alg == 'greedy':
+        elif alg == 'rgreedy':
             idx = rng.choice(np.where(diags == np.max(diags))[0])
+        elif alg == "greedy":
+            idx = np.argmax(diags)
         else:
             raise RuntimeError("Algorithm '{}' not recognized".format(alg))
 
@@ -71,8 +73,8 @@ def block_cholesky_helper(A, k, b, alg):
 def rp_cholesky(A, k):
     return cholesky_helper(A, k, 'rp')
 
-def greedy(A, k):
-    return cholesky_helper(A, k, 'greedy')
+def greedy(A, k, randomized_tiebreaking = False):
+    return cholesky_helper(A, k, 'rgreedy' if randomized_tiebreaking else 'greedy')
 
 def block_rp_cholesky(A, k, b = 100):
     return block_cholesky_helper(A, k, b, 'rp')

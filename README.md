@@ -44,15 +44,15 @@ The first step to reproducing the experiments from the manuscript is to run the 
 ```
 
 which sets up the file structure, loads RLS and DPP samplers, and downloads the QM9 dataset for the KRR example.
-The data from the figures in the paper can produced by running the following scripts, each of which has instructions for its individual use at a comment at the top:
+The data from the figures in the paper can produced by running the following scripts in the `experiments/` folder, each of which has instructions for its individual use at a comment at the top:
 
-1. `comparison.py`: compares the approximation error for different Nyström methods. Used to produce the left displays in Figure 1.
-2. `chosen.py`: outputs the pivots chosen by different Nyström methods. Used to produce the right displays in Figure 1.
-3. `entries.py`: outputs the entry evaluations for different Nyström methods. Used to produce Figure 2.
-4. `qm9_krr.py`: performs kernel ridge regression on the QM9 dataset. Used to produce Figure 3.
-5. `cluster_biomolecule.py`: performs spectral clustering on the [alanine dipeptide dataset](https://markovmodel.github.io/mdshare/ALA2/). Used to produce Figure 4.
-6. `timing.py`: compares the timing of different Nyström methods.
+1. `experiments/comparison.py`: compares the approximation error for different Nyström methods. Used to produce the left displays in Figure 1.
+2. `experiments/chosen.py`: outputs the pivots chosen by different Nyström methods. Used to produce the right displays in Figure 1.
+3. `experiments/entries.py`: outputs the entry evaluations for different Nyström methods. Used to produce Figure 2.
+4. `experiments/qm9_krr.py`: performs kernel ridge regression on the QM9 dataset. Used to produce Figure 3.
+5. `experiments/cluster_biomolecule.py`: performs spectral clustering on the [alanine dipeptide dataset](https://markovmodel.github.io/mdshare/ALA2/). Used to produce Figure 4.
+6. `experiments/timing.py`: compares the timing of different Nyström methods.
 
 Once the relevant Python scripts have been run, the figures from the paper can be generated from the relevant MATLAB scripts in `matlab_plotting`.
 
-Figure 4 in the manuscript was completely changed in revision. Figure 4 from [earlier versions of the manuscript](https://arxiv.org/abs/2207.06503v3) can be generated using the scripts `cluster_letters.py` and `cluster_letters_plot.py`.
+Figure 4 in the manuscript was completely changed in revision. Figure 4 from [earlier versions of the manuscript](https://arxiv.org/abs/2207.06503v3) can be generated using the scripts `experiments/cluster_letters.py` and `experiments/cluster_letters_plot.py`.

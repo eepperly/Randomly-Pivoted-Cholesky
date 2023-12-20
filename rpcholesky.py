@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
+import scipy as sp
 from lra import PSDLowRank
 from warnings import warn
 
@@ -63,7 +64,7 @@ def block_cholesky_helper(A, k, b, alg):
         G[cols:cols+block_size,:] = rows[cols:cols+block_size,:] - G[0:cols,idx].T @ F[0:cols,:]
         C = F[cols:cols+block_size,idx]
         L = np.linalg.cholesky(C+np.finfo(float).eps*np.trace(C)*np.identity(block_size))
-        G[cols:cols+block_size,:] = np.linalg.solve(L, G[cols:cols+block_size,:])
+        G[cols:cols+block_size,:] = sp.linalg.solve_triangular(L, G[cols:cols+block_size,:], check_finite = False, lower = True)
         diags -= np.sum(F[cols:cols+block_size,:]**2, axis=0)
         diags = diags.clip(min = 0)
 

@@ -1,4 +1,4 @@
-matrix_names = {'smile', 'outliers'};
+matrix_names = {'smile', 'spiral'};
 method_names = {'RPCholesky', 'Greedy', 'Uniform', 'RLS'};
 
 close all
@@ -9,7 +9,7 @@ for i = 1:length(matrix_names)
         markersize = 40;
         alpha = 0.04;
     else
-        markersize = 500;
+        markersize = 100;
         alpha = 0.2;
     end
     for j = 1:length(method_names)

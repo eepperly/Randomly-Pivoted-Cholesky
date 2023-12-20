@@ -7,8 +7,11 @@ methods, using the 'Smile' and 'Outliers' test matrices.
  together with 'matlab_plotting/make_comparison_plots.m'
 '''
 
+import sys
+sys.path.append('../')
+
 import numpy as np
-import dpp_lra, rp_cholesky, unif_sample, leverage_score
+import dpp_lra, rpcholesky, unif_sample, leverage_score
 from utils import approximation_error
 from matrix import PSDMatrix
 import gallery
@@ -24,8 +27,8 @@ ks = range(10, 160, 10)
 methods = { 'DPP' : dpp_lra.dpp_cubic,
             'RLS' : leverage_score.recursive_rls_acc,
             'Uniform' : unif_sample.uniform_sample,
-            'RPCholesky' : rp_cholesky.rp_cholesky,
-            'Greedy' : rp_cholesky.greedy }
+            'RPCholesky' : rpcholesky.rpcholesky,
+            'Greedy' : rpcholesky.greedy }
 
 num_trials = 100
 

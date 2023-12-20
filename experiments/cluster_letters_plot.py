@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 Code to show clustering for produced by Nystrom-
@@ -9,11 +9,14 @@ was used to produce Figure 4 in v1-v3 of the
 manuscript
 '''
 
+import sys
+sys.path.append('../')
+
 # import libraries
 from dpp_lra import dpp_cubic
 from unif_sample import uniform_sample
 from leverage_score import recursive_rls_acc
-from rp_cholesky import rp_cholesky, greedy
+from rpcholesky import rpcholesky, greedy
 
 import numpy as np
 from pdf2image import convert_from_path
@@ -45,7 +48,7 @@ if __name__ == "__main__":
     true_labels[X[:,0] > 0.942] = 1
     true_labels[X[:,1] < 2.73973 * X[:,0] - 4.43836] = 2
     
-    method = rp_cholesky
+    method = rpcholesky
     k = 140
 
     lra = method(K, k)

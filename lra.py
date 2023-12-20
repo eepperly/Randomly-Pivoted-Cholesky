@@ -32,6 +32,16 @@ class AbstractPSDLowRank(ABC):
     def matrix(self):
         return self @ np.identity(self.shape[0])
 
+    def get_rows(self):
+        if not (self.rows is None):
+            return self.rows
+        raise RuntimeError("Rows are not defined for this low-rank approximation")
+
+    def get_indices(self):
+        if not (self.idx is None):
+            return self.idx
+        raise RuntimeError("Indices are not defined for this low-rank approximation")
+    
 class CompactEigenvalueDecomposition(AbstractPSDLowRank):
 
     def __init__(self, V, Lambda, **kwargs):
@@ -41,8 +51,8 @@ class CompactEigenvalueDecomposition(AbstractPSDLowRank):
         self.shape = (self.V[0], self.V[0])
 
     @staticmethod
-    def from_F(F, **kwargs):
-        Q, R = np.linalg.qr(F, "reduced")
+    def from_G(G, **kwargs):
+        Q, R = np.linalg.qr(G.T, "reduced")
         U, S, _ = np.linalg.svd(R)
         return CompactEigenvalueDecomposition(Q @ U, S ** 2, **kwargs)
 
@@ -72,58 +82,71 @@ class CompactEigenvalueDecomposition(AbstractPSDLowRank):
         
 class PSDLowRank(AbstractPSDLowRank):
 
-    def __init__(self, F, **kwargs):
+    def __init__(self, G, **kwargs):
         super().__init__(**kwargs)
-        self.F = F
-        self.shape = (F.shape[0],F.shape[0])
+        self.G = G
+        self.shape = (G.shape[1],G.shape[1])
 
     def trace(self):
-        return np.linalg.norm(self.F, 'fro')**2
+        return np.linalg.norm(self.G, 'fro')**2
 
     def __matmul__(self,other):
-        return self.F@(self.F.T@other)
+        return self.G.T @ (self.G @ other)
 
     def rank(self):
-        return self.F.shape[1]
+        return self.G.shape[1]
 
     def matrix(self):
-        return self.F @ self.F.T
+        return self.G.T @ self.G
 
     def eigenvalue_decomposition(self):
-        return CompactEigenvalueDecomposition.from_F(self.F, idx = self.idx, rows = self.rows)
+        return CompactEigenvalueDecomposition.from_G(self.G, idx = self.idx, rows = self.rows)
 
     def scale(self, scaling):
-        return PSDLowRank(scaling[:,np.newaxis] * self.F, idx = self.idx)
+        return PSDLowRank(self.G * scaling[np.newaxis,:], idx = self.idx, rows = self.rows)
+
+    def get_left_factor(self):
+        return self.G.T
+
+    def get_right_factor(self):
+        return self.G
 
 class NystromExtension(AbstractPSDLowRank):
 
-    def __init__(self, F, C, factor = None, **kwargs):
+    def __init__(self, core, factor = None, **kwargs):
         super().__init__(**kwargs)
-        self.F = F
-        self.C = (C+C.T)/2
-        self.shape = (self.F[0], self.F[0])
-        self.factor = factor
+        if "rows" not in kwargs:
+            raise RuntimeError("Need to specify rows for Nystrom extension")
+        self.C = (core+core.T)/2
+        self.shape = (self.rows.shape[1], self.rows.shape[1])
+        self.G = factor
 
     def get_factor(self):
-        if self.factor is None:
-            L = np.linalg.cholesky(self.C+100*self.C.max()*np.finfo(float).eps*np.identity(self.C.shape[0]))
-            self.factor = np.linalg.solve(L, self.F.T).T 
-        return self.factor
+        if self.G is None:
+            L = np.linalg.cholesky(self.C+np.trace(self.C)*np.finfo(float).eps*np.identity(self.C.shape[0]))
+            self.G = np.linalg.solve(L, self.rows) 
+        return self.G
+
+    def get_left_factor(self):
+        return self.get_factor()
+
+    def get_right_factor(self):
+        return self.get_left_factor().T
         
     def trace(self):
         return np.linalg.norm(self.get_factor())**2
 
     def __matmul__(self, other):
-        return self.F@np.linalg.solve(self.C,self.F.T@other)
+        return self.rows.T @ np.linalg.solve(self.C, self.rows @ other)
 
     def rank(self):
         return self.C.shape[0]
 
     def matrix(self):
-        return self.F@np.linalg.solve(self.C,self.F.T)
+        return self.rows.T @ np.linalg.solve(self.C, self.rows)
     
     def eigenvalue_decomposition(self):
-        return CompactEigenvalueDecomposition.from_F(self.get_factor(), idx = self.idx, rows = self.rows)
+        return CompactEigenvalueDecomposition.from_G(self.get_factor(), idx = self.idx, rows = self.rows)
 
     def scale(self, scaling):
-        return NystromExtension(scaling[:,np.newaxis] * self.F, self.C, idx = self.idx)
+        return NystromExtension(self.C, idx = self.idx, rows = self.rows * scaling[np.newaxis,:])

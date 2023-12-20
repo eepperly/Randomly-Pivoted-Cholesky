@@ -2,13 +2,14 @@
 
 import numpy as np
 from lra import PSDLowRank
+from warnings import warn
 
 def cholesky_helper(A, k, alg):
     n = A.shape[0]
     diags = A.diag()
     
     # row ordering, is much faster for large scale problems
-    F = np.zeros((k,n))
+    G = np.zeros((k,n))
     rows = np.zeros((k,n))
     rng = np.random.default_rng()
     
@@ -26,18 +27,18 @@ def cholesky_helper(A, k, alg):
 
         arr_idx.append(idx)
         rows[i,:] = A[idx,:]
-        F[i,:] = (rows[i,:] - F[:i,idx].T @ F[:i,:]) / np.sqrt(diags[idx])
-        diags -= F[i,:]**2
+        G[i,:] = (rows[i,:] - G[:i,idx].T @ G[:i,:]) / np.sqrt(diags[idx])
+        diags -= G[i,:]**2
         diags = diags.clip(min = 0)
 
-    return PSDLowRank(F.T, idx = arr_idx, rows = rows)
+    return PSDLowRank(G, idx = arr_idx, rows = rows)
 
 def block_cholesky_helper(A, k, b, alg):
     diags = A.diag()
     n = A.shape[0]
     
     # row ordering
-    F = np.zeros((k,n))
+    G = np.zeros((k,n))
     rows = np.zeros((k,n))
     
     rng = np.random.default_rng()
@@ -59,24 +60,32 @@ def block_cholesky_helper(A, k, b, alg):
 
         arr_idx.extend(idx)
         rows[cols:cols+block_size,:] = A[idx,:]
-        F[cols:cols+block_size,:] = rows[cols:cols+block_size,:] - F[0:cols,idx].T @ F[0:cols,:]
+        G[cols:cols+block_size,:] = rows[cols:cols+block_size,:] - G[0:cols,idx].T @ F[0:cols,:]
         C = F[cols:cols+block_size,idx]
-        L = np.linalg.cholesky(C+100*np.finfo(float).eps*np.identity(block_size))
-        F[cols:cols+block_size,:] = np.linalg.solve(L, F[cols:cols+block_size,:])
+        L = np.linalg.cholesky(C+np.finfo(float).eps*np.trace(C)*np.identity(block_size))
+        G[cols:cols+block_size,:] = np.linalg.solve(L, G[cols:cols+block_size,:])
         diags -= np.sum(F[cols:cols+block_size,:]**2, axis=0)
         diags = diags.clip(min = 0)
 
         cols += block_size
 
-    return PSDLowRank(F.T, idx = arr_idx, rows = rows)
+    return PSDLowRank(G, idx = arr_idx, rows = rows)
 
-def rp_cholesky(A, k):
-    return cholesky_helper(A, k, 'rp')
+def rpcholesky(A, k, b = 1):
+    if b == 1:
+        return cholesky_helper(A, k, 'rp')
+    else:
+        return block_cholesky_helper(A, k, b, 'rp')
 
-def greedy(A, k, randomized_tiebreaking = False):
-    return cholesky_helper(A, k, 'rgreedy' if randomized_tiebreaking else 'greedy')
+def greedy(A, k, randomized_tiebreaking = False, b = 1):
+    if b == 1:
+        return cholesky_helper(A, k, 'rgreedy' if randomized_tiebreaking else 'greedy')
+    else:
+        if randomized_tiebreaking:
+            warn("Randomized tiebreaking not implemented for block greedy method")
+        return block_cholesky_helper(A, k, b, 'greedy')
 
-def block_rp_cholesky(A, k, b = 100):
+def block_rpcholesky(A, k, b = 100):
     return block_cholesky_helper(A, k, b, 'rp')
 
 def block_greedy(A, k, b = 100):

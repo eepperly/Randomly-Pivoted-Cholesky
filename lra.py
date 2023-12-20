@@ -95,7 +95,7 @@ class PSDLowRank(AbstractPSDLowRank):
         return self.G.T @ (self.G @ other)
 
     def rank(self):
-        return self.G.shape[1]
+        return self.G.shape[0]
 
     def matrix(self):
         return self.G.T @ self.G

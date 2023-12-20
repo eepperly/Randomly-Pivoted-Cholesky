@@ -5,7 +5,7 @@ from matrix import PSDMatrix, KernelMatrix
 import itertools
 import scipy.io
 
-def smile(N, **kwargs):
+def smile(N, bandwidth = 2.0, **kwargs):
     small = int(np.ceil(N ** (1.0/2)))
     eye_points = kwargs["eye_points"] if ("eye_points" in kwargs) else small
     mouth_points = kwargs["mouth_points"] if ("mouth_points" in kwargs) else int(np.ceil(N/10.0))
@@ -38,7 +38,7 @@ def smile(N, **kwargs):
         X[idx, 1] = 10.0 * np.sin(theta)
         idx += 1
 
-    return KernelMatrix(X, **kwargs)    
+    return KernelMatrix(X, bandwidth = bandwidth, **kwargs)    
 
 def expspiral(N, rate=1e-3, rotate_rate=5e-3, power = 1.5):
     X = np.zeros((N, 2))

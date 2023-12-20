@@ -124,14 +124,14 @@ class FunctionMatrix(AbstractPSDMatrix):
     
 class KernelMatrix(FunctionMatrix):
     @staticmethod
-    def kernel_from_input(kernel, bandwidth = 1.0, **kwargs):
+    def kernel_from_input(kernel, bandwidth = 1.0, extra_stability = False, **kwargs):
         if isinstance(kernel, str):
             if kernel == 'gaussian':
-                return partial(GaussianKernel,bandwidth=bandwidth), partial(GaussianKernel_vec, bandwidth=bandwidth), partial(GaussianKernel_mtx, bandwidth=bandwidth)
+                return partial(GaussianKernel,bandwidth=bandwidth, extra_stability=extra_stability), partial(GaussianKernel_vec, bandwidth=bandwidth, extra_stability=extra_stability), partial(GaussianKernel_mtx, bandwidth=bandwidth, extra_stability=extra_stability)
             elif kernel == 'matern':
-                return partial(MaternKernel,bandwidth=bandwidth,nu=kwargs["nu"]), partial(MaternKernel_vec,bandwidth=bandwidth,nu=kwargs["nu"]), partial(MaternKernel_mtx,bandwidth=bandwidth,nu=kwargs["nu"])
+                return partial(MaternKernel,bandwidth=bandwidth,nu=kwargs["nu"], extra_stability=extra_stability), partial(MaternKernel_vec,bandwidth=bandwidth,nu=kwargs["nu"], extra_stability=extra_stability), partial(MaternKernel_mtx,bandwidth=bandwidth,nu=kwargs["nu"], extra_stability=extra_stability)
             elif kernel == 'laplace':
-                return partial(LaplaceKernel,bandwidth=bandwidth), partial(LaplaceKernel_vec, bandwidth=bandwidth), partial(LaplaceKernel_mtx, bandwidth=bandwidth)
+                return partial(LaplaceKernel,bandwidth=bandwidth, extra_stability=extra_stability), partial(LaplaceKernel_vec, bandwidth=bandwidth, extra_stability=extra_stability), partial(LaplaceKernel_mtx, bandwidth=bandwidth, extra_stability=extra_stability)
                 
             else:
                 raise RuntimeError("Kernel name {} not recognized".format(kernel))

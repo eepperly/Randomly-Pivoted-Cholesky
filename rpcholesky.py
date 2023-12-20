@@ -5,10 +5,12 @@ import scipy as sp
 from lra import PSDLowRank
 from warnings import warn
 
-def cholesky_helper(A, k, alg, stoptol = 1e-14):
+def cholesky_helper(A, k, alg, stoptol = 0):
     n = A.shape[0]
     diags = A.diag()
     orig_trace = sum(diags)
+    if stoptol is None:
+        stoptol = 0
     
     # row ordering, is much faster for large scale problems
     G = np.zeros((k,n))
@@ -33,7 +35,7 @@ def cholesky_helper(A, k, alg, stoptol = 1e-14):
         diags -= G[i,:]**2
         diags = diags.clip(min = 0)
 
-        if sum(diags) <= stoptol * orig_trace:
+        if stoptol > 0 and sum(diags) <= stoptol * orig_trace:
             G = G[:i,:]
             rows = rows[:i,:]
             break
@@ -45,6 +47,8 @@ def block_cholesky_helper(A, k, b, alg, stoptol = 1e-14):
     n = A.shape[0]
     orig_trace = sum(diags)
     scale = 2*max(diags)
+    if stoptol is None:
+        stoptol = 1e-14
     
     # row ordering
     G = np.zeros((k,n))
@@ -72,8 +76,8 @@ def block_cholesky_helper(A, k, b, alg, stoptol = 1e-14):
         G[counter:counter+block_size,:] = rows[counter:counter+block_size,:] - G[0:counter,idx].T @ G[0:counter,:]
         C = G[counter:counter+block_size,idx]
         try:
-            L = np.linalg.cholesky(C+np.finfo(float).eps*b*scale*np.identity(block_size))
-            G[counter:counter+block_size,:] = sp.linalg.solve_triangular(L, G[counter:counter+block_size,:], check_finite = False, lower = True)
+            L = np.linalg.cholesky(C + np.finfo(float).eps*b*scale*np.identity(block_size))
+            G[counter:counter+block_size,:] = np.linalg.solve(L, G[counter:counter+block_size,:])
         except np.linalg.LinAlgError:
             warn("Cholesky failed in block partial Cholesky. Falling back to eigendecomposition")
             evals, evecs = np.linalg.eigh(C)
@@ -86,7 +90,7 @@ def block_cholesky_helper(A, k, b, alg, stoptol = 1e-14):
 
         counter += block_size
 
-        if sum(diags) <= stoptol * orig_trace:
+        if stoptol > 0 and sum(diags) <= stoptol * orig_trace:
             G = G[:counter,:]
             rows = rows[:counter,:]
             break
@@ -114,6 +118,8 @@ def accelerated_rpcholesky(A, k, b = 100, stoptol = 1e-14):
     diags = A.diag()
     n = A.shape[0]
     orig_trace = sum(diags)
+    if stoptol is None:
+        stoptol = 1e-14
     
     # row ordering
     G = np.zeros((k,n))
@@ -126,7 +132,7 @@ def accelerated_rpcholesky(A, k, b = 100, stoptol = 1e-14):
     while counter < k:
         idx = rng.choice(range(n), size = b, p = diags / sum(diags), replace=True)
 
-        H = A[idx, idx] - G[:counter,idx].T @ G[:counter,idx]
+        H = A[idx, idx] - G[0:counter,idx].T @ G[0:counter,idx]
         L, accepted = rejection_cholesky(H)
         num_sel = len(accepted)
         print(num_sel)
@@ -141,20 +147,20 @@ def accelerated_rpcholesky(A, k, b = 100, stoptol = 1e-14):
         arr_idx[counter:counter+num_sel] = idx
         rows[counter:counter+num_sel,:] = A[idx,:]
         G[counter:counter+num_sel,:] = rows[counter:counter+num_sel,:] - G[0:counter,idx].T @ G[0:counter,:]
-        G[counter:counter+num_sel,:] = sp.linalg.solve_triangular(L, G[counter:counter+num_sel,:], check_finite = False, lower = True)
+        G[counter:counter+num_sel,:] = np.linalg.solve(L, G[counter:counter+num_sel,:])
         diags -= np.sum(G[counter:counter+num_sel,:]**2, axis=0)
         diags = diags.clip(min = 0)
 
         counter += num_sel
 
-        if sum(diags) <= stoptol * orig_trace:
+        if stoptol > 0 and sum(diags) <= stoptol * orig_trace:
             G = G[:counter,:]
             rows = rows[:counter,:]
             break
 
     return PSDLowRank(G, idx = arr_idx, rows = rows)
 
-def rpcholesky(A, k, b = None, accelerated = False, stoptol = 1e-14):
+def rpcholesky(A, k, b = None, accelerated = False, stoptol = None):
     if b is None:
         if accelerated:
             return accelerated_rpcholesky(A, k, stoptol = stoptol)
@@ -165,7 +171,7 @@ def rpcholesky(A, k, b = None, accelerated = False, stoptol = 1e-14):
     else:
         return block_cholesky_helper(A, k, b, 'rp', stoptol = stoptol)
 
-def greedy(A, k, randomized_tiebreaking = False, b = 1, stoptol = 1e-14):
+def greedy(A, k, randomized_tiebreaking = False, b = 1, stoptol = None):
     if b == 1:
         return cholesky_helper(A, k, 'rgreedy' if randomized_tiebreaking else 'greedy', stoptol = stoptol)
     else:
@@ -173,8 +179,8 @@ def greedy(A, k, randomized_tiebreaking = False, b = 1, stoptol = 1e-14):
             warn("Randomized tiebreaking not implemented for block greedy method")
         return block_cholesky_helper(A, k, b, 'greedy', stoptol = stoptol)
 
-def block_rpcholesky(A, k, b = 100, stoptol = 1e-14):
+def block_rpcholesky(A, k, b = 100, stoptol = None):
     return block_cholesky_helper(A, k, b, 'rp', stoptol = stoptol)
 
-def block_greedy(A, k, b = 100, stoptol = 1e-14):
+def block_greedy(A, k, b = 100, stoptol = None):
     return block_cholesky_helper(A, k, b, 'greedy', stoptol = stoptol)

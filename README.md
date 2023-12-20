@@ -53,6 +53,6 @@ The data from the figures in the paper can produced by running the following scr
 5. `experiments/cluster_biomolecule.py`: performs spectral clustering on the [alanine dipeptide dataset](https://markovmodel.github.io/mdshare/ALA2/). Used to produce Figure 4.
 6. `experiments/timing.py`: compares the timing of different Nyström methods.
 
-Once the relevant Python scripts have been run, the figures from the paper can be generated from the relevant MATLAB scripts in `matlab_plotting`.
+Once the relevant Python scripts have been run, the figures from the paper can be generated from the relevant MATLAB scripts in `experiments/matlab_plotting/`.
 
 Figure 4 in the manuscript was completely changed in revision. Figure 4 from [earlier versions of the manuscript](https://arxiv.org/abs/2207.06503v3) can be generated using the scripts `experiments/cluster_letters.py` and `experiments/cluster_letters_plot.py`.

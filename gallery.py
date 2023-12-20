@@ -40,6 +40,34 @@ def smile(N, **kwargs):
 
     return KernelMatrix(X, **kwargs)    
 
+def expspiral(N, rate=1e-3, rotate_rate=5e-3, power = 1.5):
+    X = np.zeros((N, 2))
+    t = np.array(range(N))
+    X[:,0] = np.exp(-rate * N * (t/N) ** power) * np.cos(rotate_rate * t)
+    X[:,1] = np.exp(-rate * N * (t/N) ** power) * np.sin(rotate_rate * t)
+    sigma = 0.02
+    return KernelMatrix(X, bandwidth = sigma)
+
+def robspiral(N):
+    times = np.linspace(0, 2, N)
+    times = times ** 6
+    times = times[::-1]
+    x = np.exp(.2 * times) * np.cos(times)
+    y = np.exp(.2 * times) * np.sin(times)
+    X = np.column_stack((x,y))
+    bandwidth = 1000
+    return KernelMatrix(X, bandwidth = bandwidth)
+
+def powerspiral(N, max_radius = 1.0, angle = 0.2, decay_power = 1, bandwidth = 1e-3):
+    X = np.zeros((N, 2))
+    t = np.array(range(1,N+1), dtype=float)
+    radii = max_radius * t ** (-decay_power)
+    angles = angle * t
+    X[:,0] = radii * np.cos(angles)
+    X[:,1] = radii * np.sin(angles)
+    # np.random.shuffle(X)
+    return KernelMatrix(X, bandwidth = bandwidth)
+
 def outliers(N, num_outliers = 50):
     X = 0.5*np.random.randn(N, 20)/np.sqrt(20.0)
     X[np.random.choice(range(N), size = num_outliers, replace = False),:] += 100.0 * np.random.randn(num_outliers, 20)

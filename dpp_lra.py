@@ -10,25 +10,26 @@ def dpp_sample_helper(A, k, **params):
     n = A.shape[0]
     mode = 'alpha' if ('mode' not in params) else params['mode']
 
-    if mode == 'alpha' or mode == 'vfx':
-        X = np.array([range(n)]).T
-        dpp = FiniteDPP('likelihood', False, L_eval_X_data = (MatrixWrapper(A), X))
-    else:
-        dpp = FiniteDPP('likelihood', False, L = A)
+    if A.dpp_stuff is None or A.dpp_stuff[1] != k:        
+        if mode == 'alpha' or mode == 'vfx':
+            X = np.array([range(n)]).T
+            A.dpp_stuff = (FiniteDPP('likelihood', False, L_eval_X_data = (MatrixWrapper(A), X)), k)
+        else:
+            A.dpp_stuff = (FiniteDPP('likelihood', False, L = A[:,:]), k)
 
     sys.stderr = open(os.devnull, 'w')
     if mode == 'mcmc':
-        sample = dpp.sample_mcmc_k_dpp(k)
+        sample = A.dpp_stuff[0].sample_mcmc_k_dpp(k)
     elif mode == 'alpha':
-        sample = dpp.sample_exact_k_dpp(k, mode=mode, early_stop=True)
+        sample = A.dpp_stuff[0].sample_exact_k_dpp(k, mode=mode, early_stop=True)
     else:
-        sample = dpp.sample_exact_k_dpp(k, mode=mode)
+        sample = A.dpp_stuff[0].sample_exact_k_dpp(k, mode=mode)
     sys.stderr = sys.__stderr__
 
     return lra_from_sample(A, sample)
         
 def dpp_cubic(A, k):
-    return dpp_sample_helper(A[:,:], k, mode = 'GS')
+    return dpp_sample_helper(A, k, mode = 'GS')
 
 def dpp_vfx(A, k):
     return dpp_sample_helper(A, k, mode = 'vfx')

@@ -44,7 +44,7 @@ def block_cholesky_helper(A, k, b, alg, stoptol = 1e-14):
     diags = A.diag()
     n = A.shape[0]
     orig_trace = sum(diags)
-    scale = 4 * max(diags)
+    scale = 2*max(diags)
     
     # row ordering
     G = np.zeros((k,n))
@@ -72,14 +72,14 @@ def block_cholesky_helper(A, k, b, alg, stoptol = 1e-14):
         G[counter:counter+block_size,:] = rows[counter:counter+block_size,:] - G[0:counter,idx].T @ G[0:counter,:]
         C = G[counter:counter+block_size,idx]
         try:
-            L = np.linalg.cholesky(C+np.finfo(float).eps*max(scale, np.trace(C))*np.identity(block_size))
+            L = np.linalg.cholesky(C+np.finfo(float).eps*b*scale*np.identity(block_size))
             G[counter:counter+block_size,:] = sp.linalg.solve_triangular(L, G[counter:counter+block_size,:], check_finite = False, lower = True)
         except np.linalg.LinAlgError:
             warn("Cholesky failed in block partial Cholesky. Falling back to eigendecomposition")
             evals, evecs = np.linalg.eigh(C)
             evals[evals > 0] = evals[evals > 0] ** (-0.5)
             evals[evals < 0] = 0
-            print(G.shape, evecs.shape, evals.shape)
+            print(counter,G.shape, evecs.shape, evals.shape)
             G[counter:counter+block_size,:] = evals[:,np.newaxis] * (evecs.T @ G[counter:counter+block_size,:])
         diags -= np.sum(G[counter:counter+block_size,:]**2, axis=0)
         diags = diags.clip(min = 0)

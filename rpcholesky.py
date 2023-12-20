@@ -61,11 +61,11 @@ def block_cholesky_helper(A, k, b, alg):
 
         arr_idx.extend(idx)
         rows[cols:cols+block_size,:] = A[idx,:]
-        G[cols:cols+block_size,:] = rows[cols:cols+block_size,:] - G[0:cols,idx].T @ F[0:cols,:]
-        C = F[cols:cols+block_size,idx]
+        G[cols:cols+block_size,:] = rows[cols:cols+block_size,:] - G[0:cols,idx].T @ G[0:cols,:]
+        C = G[cols:cols+block_size,idx]
         L = np.linalg.cholesky(C+np.finfo(float).eps*np.trace(C)*np.identity(block_size))
         G[cols:cols+block_size,:] = sp.linalg.solve_triangular(L, G[cols:cols+block_size,:], check_finite = False, lower = True)
-        diags -= np.sum(F[cols:cols+block_size,:]**2, axis=0)
+        diags -= np.sum(G[cols:cols+block_size,:]**2, axis=0)
         diags = diags.clip(min = 0)
 
         cols += block_size

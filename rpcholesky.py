@@ -71,6 +71,23 @@ def block_cholesky_helper(A, k, b, alg):
 
     return PSDLowRank(G, idx = arr_idx, rows = rows)
 
+def rejection_cholesky(H):
+    b = H.shape[0]
+    if H.shape[0] != H.shape[1]:
+        raise RuntimeError("rejection_cholesky requires a square matrix")
+    u = np.array([H[j,j] for j in range(b)])
+
+    idx = []
+    L = np.zeros((b,b))
+    for j in range(b):
+        if np.random.rand() * H[j,j] < u[j]:
+            idx.append(j)
+            L[j:,j] = H[j:,j] / np.sqrt(H[j,j])
+            H[(j+1):,(j+1):] -= L[j:,j] @ L[j:,j].T
+    idx = np.array(idx)
+    L = L[idx,idx]
+    return L, idx
+
 def rpcholesky(A, k, b = 1):
     if b == 1:
         return cholesky_helper(A, k, 'rp')

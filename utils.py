@@ -2,7 +2,6 @@
 
 import numpy as np
 from lra import NystromExtension
-from scipy.linalg import solve_triangular
 
 def lra_from_sample(A, sample):
     rows = A[sample,:]

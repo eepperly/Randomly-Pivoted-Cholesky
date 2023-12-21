@@ -83,7 +83,6 @@ def block_cholesky_helper(A, k, b, alg, stoptol = 1e-14):
             evals, evecs = np.linalg.eigh(C)
             evals[evals > 0] = evals[evals > 0] ** (-0.5)
             evals[evals < 0] = 0
-            print(counter,G.shape, evecs.shape, evals.shape)
             G[counter:counter+block_size,:] = evals[:,np.newaxis] * (evecs.T @ G[counter:counter+block_size,:])
         diags -= np.sum(G[counter:counter+block_size,:]**2, axis=0)
         diags = diags.clip(min = 0)
@@ -135,7 +134,6 @@ def accelerated_rpcholesky(A, k, b = 100, stoptol = 1e-14):
         H = A[idx, idx] - G[0:counter,idx].T @ G[0:counter,idx]
         L, accepted = rejection_cholesky(H)
         num_sel = len(accepted)
-        print(num_sel)
 
         if num_sel > k - counter:
             num_sel = k - counter

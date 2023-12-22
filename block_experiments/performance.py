@@ -8,6 +8,7 @@ from gallery import gallery
 from rpcholesky import rpcholesky
 from time import time
 from scipy.io import savemat
+import os
 
 N = int(1e4)
 k = int(1e3)
@@ -21,7 +22,7 @@ methods = { "RPCholesky" : lambda A, k: rpcholesky(A, k),
 
 stuff_to_save = {**{ f"{name}_time" : [] for name in methods }, **{ f"{name}_error" : [] for name in methods }}
 
-for item, info in enumerate(gallery(N)):
+for item, info in enumerate(gallery(N, datafolder=os.path.join(os.getcwd(),"datasets"), min_N=N/10)):
     if item >= max_items:
         break
     matname, A = info
@@ -32,7 +33,7 @@ for item, info in enumerate(gallery(N)):
     Atrace = A.trace()
     best_error = (Atrace - sum(np.sort(lra.evals())[-k:])) / Atrace
     del lra
-    if best_error < 1e-14:
+    if best_error < 1e-13:
         print(f"Error was {best_error}. This matrix is too rank-deficient, moving on")
         continue
     print(f"Done! Error was {best_error}")

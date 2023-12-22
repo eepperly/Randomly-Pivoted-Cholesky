@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 import numbers
 from kernels import MaternKernel, MaternKernel_vec, MaternKernel_mtx, GaussianKernel, GaussianKernel_vec, GaussianKernel_mtx, LaplaceKernel, LaplaceKernel_vec, LaplaceKernel_mtx
 from functools import partial
+from sklearn.metrics.pairwise import euclidean_distances, manhattan_distances
 
 class AbstractPSDMatrix(ABC):
 
@@ -124,6 +125,17 @@ class FunctionMatrix(AbstractPSDMatrix):
     
 class KernelMatrix(FunctionMatrix):
     @staticmethod
+    def median_trick(X, kernel):
+        if kernel in ["gaussian", "matern"]:
+            dists = euclidean_distances(X,X)
+        elif kernel in "laplace":
+            dists = manhattan_distances(X,X)
+        else:
+            raise RuntimeError(f"Median trick is not implement for kernel {kernel}")
+
+        return np.median(dists)
+            
+    @staticmethod
     def kernel_from_input(kernel, bandwidth = 1.0, extra_stability = False, **kwargs):
         if isinstance(kernel, str):
             if kernel == 'gaussian':
@@ -140,6 +152,11 @@ class KernelMatrix(FunctionMatrix):
     
     def __init__(self, X, kernel = "gaussian", bandwidth = 1.0, **kwargs):
         super().__init__(X.shape[0],**kwargs)
+        if bandwidth == "median":
+            bandwidth = KernelMatrix.median_trick(X, kernel)
+        elif bandwidth == "approx_median":
+            idx = np.random.choice(X.shape[0], size = min(X.shape[0],1000), replace=False)
+            bandwidth = KernelMatrix.median_trick(X[idx,:], kernel)
         self.data = X
         kernel, kernel_vec, kernel_mtx = KernelMatrix.kernel_from_input(kernel, bandwidth = bandwidth, **kwargs)
         self.kernel = kernel

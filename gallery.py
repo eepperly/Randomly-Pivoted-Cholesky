@@ -40,13 +40,12 @@ def smile(N, bandwidth = 2.0, **kwargs):
 
     return KernelMatrix(X, bandwidth = bandwidth, **kwargs)    
 
-def expspiral(N, rate=1e-3, rotate_rate=5e-3, power = 1.5):
+def expspiral(N, rate=1e-3, rotate_rate=5e-3, power = 1.5, bandwidth = 0.02):
     X = np.zeros((N, 2))
     t = np.array(range(N))
     X[:,0] = np.exp(-rate * N * (t/N) ** power) * np.cos(rotate_rate * t)
     X[:,1] = np.exp(-rate * N * (t/N) ** power) * np.sin(rotate_rate * t)
-    sigma = 0.02
-    return KernelMatrix(X, bandwidth = sigma)
+    return KernelMatrix(X, bandwidth = bandwidth)
 
 def robspiral(N):
     times = np.linspace(0, 2, N)
@@ -85,11 +84,11 @@ def kernel_from_data(data, **kwargs):
     return KernelMatrix(data, bandwidth = np.sqrt(stddev / data.shape[0]), **kwargs)
 
 def gallery(N):
-    yield "Smile", smile(N, bandwidth=0.2, extra_stability=True)
-    yield "Exponential Spiral", expspiral(N)
-    # yield "Power Spiral (high bandwidth)", powerspiral(N, bandwidth=1e-4)
-    # yield "Power Spiral (medium bandwidth)", powerspiral(N, bandwidth=1e-5)
-    # yield "Power Spiral (low bandwidth)", powerspiral(N, bandwidth=1e-6)
+    yield "Smile (high)", smile(N, bandwidth=0.2, extra_stability=True)
+    yield "Smile (medium)", smile(N, bandwidth=0.15, extra_stability=True)
+    yield "Smile (low)", smile(N, bandwidth=0.01, extra_stability=True)
+    yield "Exponential Spiral (high)", expspiral(N)
+    yield "Exponential Spiral (low)", expspiral(N,bandwidth=0.005)
     yield "Outliers (50)", outliers(N)
     yield "Outliers (500)", outliers(N, num_outliers=500)
     yield "Outliers (5000)", outliers(N, num_outliers=5000)

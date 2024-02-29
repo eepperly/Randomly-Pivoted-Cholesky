@@ -10,9 +10,9 @@ from time import time
 from scipy.io import savemat
 import os
 
-N = int(1e4)
+N = int(1e5)
 k = int(1e3)
-b = int(1e2)
+b = int(1.5e2)
 max_items = np.Inf
 trials = 1
 
@@ -28,7 +28,7 @@ for item, info in enumerate(gallery(N, datafolder=os.path.join(os.getcwd(),"data
     matname, A = info
 
     print(f"Computing a reference low-rank approximation to matrix {matname}")
-    lra = rpcholesky(A, 3*k, b = 100, accelerated = True)
+    lra = rpcholesky(A, 2*k, b = 100, accelerated = True)
     lra = lra.eigenvalue_decomposition()
     Atrace = A.trace()
     best_error = (Atrace - sum(np.sort(lra.evals())[-k:])) / Atrace
@@ -39,18 +39,18 @@ for item, info in enumerate(gallery(N, datafolder=os.path.join(os.getcwd(),"data
     print(f"Done! Error was {best_error}")
     
     for name, method in methods.items():
-        start = time()
-        lra = method(A, k)
-        stop = time()
-
-        total_time = stop - start
+        total_time = 0.0
+        error_ratio = 0.0
+        for trial in range(trials):
+            start = time()
+            lra = method(A, k)
+            stop = time()
+            total_time += (stop - start) / trials
+            error_ratio += (Atrace - lra.trace()) / Atrace / best_error / trials
+            del lra
+            
         stuff_to_save[f"{name}_time"].append(total_time)
-
-        error_ratio = (Atrace - lra.trace()) / Atrace / best_error
         stuff_to_save[f"{name}_error"].append(error_ratio)
-
-        del lra
-
         print(f"{item}\t{name}\t{total_time}\t{error_ratio}")
 
     savemat("data/performance.mat", stuff_to_save)

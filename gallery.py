@@ -41,6 +41,12 @@ def smile(N, bandwidth = 2.0, **kwargs):
         X[idx, 1] = 10.0 * np.sin(theta)
         idx += 1
 
+    if "dimension" in kwargs:
+        d = kwargs["dimension"]
+        Q, _ = np.linalg.qr(np.random.randn(d, 2))
+        Q = Q.T
+        X = X @ Q
+
     return KernelMatrix(X, bandwidth = bandwidth, **kwargs)    
 
 def expspiral(N, rate=1e-3, rotate_rate=5e-3, power = 1.5, bandwidth = 0.02):
@@ -104,9 +110,10 @@ def gallery(N, datafolder = None, min_N=None):
     
     yield "Smile (high)", smile(N, bandwidth=0.2, extra_stability=True)
     yield "Smile (medium)", smile(N, bandwidth=0.15, extra_stability=True)
-    yield "Smile (low)", smile(N, bandwidth=0.01, extra_stability=True)
-    yield "Exponential Spiral (high)", expspiral(N)
-    yield "Exponential Spiral (low)", expspiral(N,bandwidth=0.005)
+    yield "Smile (low)", smile(N, bandwidth=0.1, extra_stability=True)
+    yield "Exponential Spiral (high)", expspiral(N,bandwidth=0.02)
+    yield "Exponential Spiral (medium)", expspiral(N,bandwidth=0.015)
+    yield "Exponential Spiral (low)", expspiral(N,bandwidth=0.01)
     yield "Outliers (50)", outliers(N)
     yield "Outliers (500)", outliers(N, num_outliers=500)
     yield "Outliers (5000)", outliers(N, num_outliers=5000)

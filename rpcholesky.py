@@ -44,22 +44,28 @@ def cholesky_helper(A, k, alg, stoptol = 0):
 
     return PSDLowRank(G, idx = arr_idx, rows = rows)
 
-def _greedy_cholesky(A, tol = None):
+def _greedy_cholesky(A, rtol = None, atol = None):
+    trace = np.trace(A)
     L, piv, rank, info = greedy_lapack(A, lower=True)
     L = np.tril(L)
-    if not (tol is None):
-        index = np.where(np.abs(np.diagonal(L)) < np.sqrt(tol))[0]
-        if len(index) > 0:
-            rank = index[0]
+    if not (rtol is None) and not (atol is None):
+        if atol is None:
+            atol = 0
+        if rtol is None:
+            rtol = 0
+        trailing_sums = trace - np.cumsum(np.linalg.norm(L, axis=0)**2)
+        rank = np.argmax(trailing_sums < (atol + rtol * trace)) + 1
     return L, piv, rank
 
-def block_cholesky_helper(A, k, b, alg, stoptol = 1e-14, strategy = "regularize"):
+def block_cholesky_helper(A, k, b, alg, stoptol = 1e-14, strategy = "regularize", rbrp_atol = 0.0, rbrp_rtol = "1/b"):
     diags = A.diag()
     n = A.shape[0]
     orig_trace = sum(diags)
     scale = 2*max(diags)
     if stoptol is None:
         stoptol = 1e-14
+    if "1/b" == rbrp_rtol:
+        rbrp_rtol = 1.0/b
     
     # row ordering
     G = np.zeros((k,n))
@@ -99,10 +105,9 @@ def block_cholesky_helper(A, k, b, alg, stoptol = 1e-14, strategy = "regularize"
                 evals[evals < 0] = 0
                 G[counter:counter+block_size,:] = evals[:,np.newaxis] * (evecs.T @ G[counter:counter+block_size,:])
 
-        elif "pivoting" == strategy or "pivoted" == strategy:
+        elif "rbrp" == strategy or "pivoting" == strategy or "pivoted" == strategy:
             H = A[idx,idx] - G[0:counter,idx].T @ G[0:counter,idx]
-            # L, piv, rank = _greedy_cholesky(H, tol = np.finfo(float).eps*b*scale)
-            L, piv, rank = _greedy_cholesky(H, tol = 1e-14)
+            L, piv, rank = _greedy_cholesky(H, rtol = rbrp_rtol, atol = rbrp_atol)
             idx = idx[piv[0:rank]-1]
             arr_idx.extend(idx)
             rows[counter:counter+len(idx),:] = A[idx,:]
@@ -155,7 +160,7 @@ def accelerated_rpcholesky(A, k, b = 100, stoptol = 1e-13):
     rows = np.zeros((k,n))
     
     rng = np.random.default_rng()
-    arr_idx = np.zeros(k)
+    arr_idx = np.zeros(k, dtype=int)
     
     counter = 0
     while counter < k:

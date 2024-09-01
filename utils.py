@@ -8,7 +8,7 @@ def lra_from_sample(A, sample):
     F = A[:,sample]
     C = F[sample,:]
     k = C.shape[0]
-    Lc = np.linalg.cholesky(C+100*C.max()*np.finfo(float).eps*np.identity(k))
+    Lc = np.linalg.cholesky(C+C.shape[0]*C.max()*np.finfo(float).eps*np.identity(k))
     factor = solve_triangular(Lc, F.T,lower=True).T     
     return NystromExtension(F, C, factor=factor, idx = sample, rows = F.T)
 

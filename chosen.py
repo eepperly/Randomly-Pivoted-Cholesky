@@ -18,6 +18,8 @@ from utils import approximation_error
 n = 10000
 k = 40
 
+np.random.seed(342384230)
+
 # Add matrices
 As = { "smile" : gallery.smile(n, bandwidth = 2.0),
        "spiral" : gallery.robspiral(n) }

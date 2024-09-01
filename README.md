@@ -2,6 +2,19 @@
 
 This contains code to reproduce the numerical experiments for [_Randomly pivoted Cholesky: Practical approximation of a kernel matrix with few entry evaluations_](https://arxiv.org/abs/2207.06503) by [Yifan Chen](https://yifanc96.github.io), [Ethan N. Epperly](https://www.ethanepperly.com), [Joel A. Tropp](https://tropp.caltech.edu), and [Robert J. Webber](https://rwebber.people.caltech.edu).
 
+## Citing this Repository
+
+If you use our code in your work, we recommend the citing the following BibTeX entry:
+
+#+begin_src bibtex
+@article{chen2023randomly,
+  title={Randomly pivoted Cholesky: Practical approximation of a kernel matrix with few entry evaluations},
+  author={Yifan Chen and Ethan N. Epperly and Joel A. Tropp and Robert J. Webber},
+  journal={arXiv preprint arXiv:2207.06503},
+  year={2023}
+}
+#+end_src
+
 ## Algorithm
 
 Randomly pivoted Cholesky (RPCholesky) computes a low-rank approximation to a positive semidefinite matrix $\boldsymbol{A}$.

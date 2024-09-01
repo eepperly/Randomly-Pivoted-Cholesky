@@ -1,9 +1,10 @@
 method_names = { 'DPP', 'RLS', 'Uniform', 'Greedy', 'RPCholesky'};
 method_names_for_plot = { 'DPP', 'RLS', 'Uniform', 'Greedy', 'RPCholesky'};
-ks = 0:20:100;
+ks = 0:10:150;
 specs = {'-', '--', ':', '*-', '-.'};
-names = {'smile', 'outliers'};
+names = {'smile', 'spiral'};
 
+close all
 for l = 1:2
     figure(l)
     for j = 1:length(method_names)
@@ -20,11 +21,13 @@ for l = 1:2
         hold on
     end
     
-    legend(method_names_for_plot, 'location', 'best', 'FontSize', 26)
-    xlabel('$k$','FontSize', 26)
+    if l == 1
+        legend(method_names_for_plot, 'location', 'best', 'FontSize', 26)
+    end
+    xlabel('Rank $k$','FontSize', 26)
     ylabel('(Entry evaluations) / $Nk$', 'FontSize', 26)
     set(gca, 'YScale', 'log')
-    axis([20 100 0.5 1000])
+    axis([10 150 0.5 1000])
     ax = gca; ax.FontSize = 20; 
     saveas(gcf, sprintf('../figs/entries_%s.png', names{l}));
 end

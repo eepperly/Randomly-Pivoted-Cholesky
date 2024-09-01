@@ -10,11 +10,14 @@ QM9 dataset must first be stored in 'data/homo.mat'
 as is done by qm9_krr.py
 '''
 
+import sys
+sys.path.append('../')
+
 import scipy.io
 from scipy.io import savemat
 import numpy as np
 from KRR_Nystrom import KRR_Nystrom
-import rp_cholesky, leverage_score, unif_sample
+import rpcholesky, leverage_score, unif_sample
 
 data = scipy.io.loadmat('data/homo.mat')
 X = data['X']
@@ -45,8 +48,8 @@ uniform_largest_atom_error = 0.0
 
 methods = { 'Uniform' : unif_sample.uniform_sample,
             'RLS' : leverage_score.recursive_rls_acc,
-            'RPCholesky' : rp_cholesky.rp_cholesky,
-            'Greedy' : rp_cholesky.greedy }
+            'RPCholesky' : rpcholesky.rpcholesky,
+            'Greedy' : rpcholesky.greedy }
 
 all_errors = { 'RLS' : [], 'Uniform' : [], 'RPCholesky' : [], 'Greedy' : [] }
 all_smapes = { 'RLS' : [], 'Uniform' : [], 'RPCholesky' : [], 'Greedy' : [] }

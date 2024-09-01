@@ -7,10 +7,13 @@ data, and the approximation rank can be set by changing
 n, d, and ks.
 '''
 
+import sys
+sys.path.append('../')
+
 import numpy as np
 import time as time
 import dpp_lra
-import rp_cholesky
+import rpcholesky
 import unif_sample
 import leverage_score
 from utils import approximation_error
@@ -29,9 +32,9 @@ num_trials = 1
 
 methods = { 'RLS' : leverage_score.recursive_rls_acc,
             'Uniform' : unif_sample.uniform_sample,
-            'RPCholesky' : rp_cholesky.rp_cholesky,
-            'Greedy' : rp_cholesky.greedy,
-            'BlockRPCholesky' : rp_cholesky.block_rp_cholesky,
+            'RPCholesky' : rpcholesky.rpcholesky,
+            'Greedy' : rpcholesky.greedy,
+            'BlockRPCholesky' : rpcholesky.block_rpcholesky,
             'DPP' : dpp_lra.dpp_vfx }
 
 for name, method in methods.items():

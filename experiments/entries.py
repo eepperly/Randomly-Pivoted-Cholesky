@@ -7,8 +7,11 @@ test matrices This code was used to produce Figure 2 in the
 manuscript together with 'matlab_plotting/make_entry_plots.m'
 '''
 
+import sys
+sys.path.append('../')
+
 import numpy as np
-import dpp_lra, rp_cholesky, unif_sample, leverage_score
+import dpp_lra, rpcholesky, unif_sample, leverage_score
 import gallery
 import scipy
 
@@ -24,8 +27,8 @@ matrices = { "smile" : gallery.smile(n, bandwidth = 2.0),
 methods = { 'DPP' : dpp_lra.dpp_vfx,
             'RLS' : leverage_score.recursive_rls_acc,
             'Uniform' : unif_sample.uniform_sample,
-            'RPCholesky' : rp_cholesky.rp_cholesky,
-            'Greedy' : rp_cholesky.greedy }
+            'RPCholesky' : rpcholesky.rpcholesky,
+            'Greedy' : rpcholesky.greedy }
 
 for matrix_name, A in matrices.items():
     print(matrix_name)

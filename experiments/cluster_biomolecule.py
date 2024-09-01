@@ -13,6 +13,9 @@ Ethan Epperly.
 # SETUP
 # =====
 
+import sys
+sys.path.append('../')
+
 # import libraries
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,7 +24,7 @@ import scipy.linalg as spl
 from itertools import permutations
 from unif_sample import uniform_sample
 from leverage_score import recursive_rls_acc
-from rp_cholesky import rp_cholesky, greedy
+from rpcholesky import rpcholesky, greedy
 from matrix import KernelMatrix
 
 # pretty plots
@@ -59,7 +62,7 @@ perms = np.array(list(permutations(np.arange(centers)))) # for later index permu
 sigma = .1
 k = 150
 rgreedy = lambda A, k: greedy(A, k, randomized_tiebreaking = True)
-methods = { 'RPCholesky' : rp_cholesky,
+methods = { 'RPCholesky' : rpcholesky,
             'Greedy' : rgreedy,
             'RLS' : recursive_rls_acc,
             'Uniform' : uniform_sample }
@@ -69,8 +72,8 @@ for name, method in methods.items():
     print(name)
     
     lra = method(A, k)
-    F = lra.F.T
-    idx = lra.idx
+    F = lra.get_right_factor()
+    idx = lra.get_indices()
     print("Low-rank approximation done!")
     
     # dense eigensolver
@@ -150,7 +153,7 @@ for name, method in methods.items():
 
             # dense eigensolver
             lra = method(A, k)
-            F = lra.F.T
+            F = lra.get_right_factor()
             normal = F.T @ (F @ np.ones(F.shape[1]))
             normal[normal > 0] = normal[normal > 0]**-.5
             F = F * normal[np.newaxis, :]

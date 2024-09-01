@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 Code to perform KRR on the QM9 dataset using different
@@ -10,11 +10,14 @@ was used to produce Figure 3 in the manuscript together
 with 'matlab_plotting/make_krr_plots.m'
 '''
 
+import sys
+sys.path.append('../')
+
 import qml, os
 from scipy.io import savemat, loadmat
 import numpy as np
 
-def get_molecules(directory = "molecules/", max_atoms = 29, max_mols = np.Inf, output_index = 9):
+def get_molecules(directory = "molecules/", max_atoms = 29, max_mols = np.Inf, output_index = 7):
     compounds = []
     energies = []
     for f in sorted(os.listdir("molecules/")):
@@ -30,7 +33,7 @@ def get_molecules(directory = "molecules/", max_atoms = 29, max_mols = np.Inf, o
             compounds.append(mol)
         except ValueError:
             pass
-
+    
     c = list(zip(compounds, energies))
     np.random.shuffle(c)
     compounds, energies = zip(*c)
@@ -47,7 +50,7 @@ if __name__ == "__main__":
         savemat("data/homo.mat", data)
     else:
         data = loadmat("data/homo.mat")
-
+        
     feature = data['X']
     target = data['Y'].flatten()
     from sklearn.preprocessing import StandardScaler
@@ -72,18 +75,18 @@ if __name__ == "__main__":
         return np.mean(abs(true - pred)/((abs(true)+abs(pred))/2))
 
     from KRR_Nystrom import KRR_Nystrom
-    import rp_cholesky
+    import rpcholesky
     import leverage_score
     import unif_sample
     import matplotlib.pyplot as plt
     import time
     from functools import partial
 
-    methods = { 'Greedy' : rp_cholesky.greedy,
+    methods = { 'Greedy' : rpcholesky.greedy,
                 'Uniform' : unif_sample.uniform_sample,
-                'RPCholesky' : rp_cholesky.rp_cholesky,
+                'RPCholesky' : rpcholesky.rpcholesky,
                 'RLS' : leverage_score.recursive_rls_acc,
-                'block50RPCholesky' : partial(rp_cholesky.block_rp_cholesky,b=50) }
+                'block50RPCholesky' : partial(rpcholesky.block_rpcholesky,b=50) }
 
     num_trials = 100
     lamb = 1.0e-8

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 '''
 Code to test clustering by Nystrom-acclerated
@@ -8,11 +8,14 @@ in v1-v3 of the manuscript together with
 'matlab_plotting/make_clustering_plots.m'
 '''
 
+import sys
+sys.path.append('../')
+
 # import libraries
 from dpp_lra import dpp_cubic
 from unif_sample import uniform_sample
 from leverage_score import recursive_rls_acc
-from rp_cholesky import rp_cholesky, greedy
+from rpcholesky import rpcholesky, greedy
 
 import numpy as np
 from scipy.io import savemat
@@ -34,7 +37,7 @@ methods = { 'DPP' : dpp_cubic,
             'Greedy' : greedy,
             'RLS' : recursive_rls_acc,
             'Uniform' : uniform_sample,
-            'RPCholesky' : rp_cholesky }
+            'RPCholesky' : rpcholesky }
 
 for name, method in methods.items():
     accuracies = np.zeros((len(ks), num_trials))

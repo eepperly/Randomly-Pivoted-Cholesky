@@ -23,8 +23,8 @@ ks = [10] + list(range(200,1100,200))
 methods = { "Accel" : lambda k: rpcholesky(A, k, accelerated = True, b = 120),
             "Block" : lambda k: rpcholesky(A, k, b = 120),
             "Basic" : lambda k: rpcholesky(A, k) }
-times = { method : np.zeros(len(ks),trials) for method in methods } 
-errs = { method : np.zeros(len(ks),trials) for method in methods } 
+times = { method : np.zeros((len(ks),trials)) for method in methods } 
+errs =  { method : np.zeros((len(ks),trials)) for method in methods } 
 
 for idx in range(len(ks)):
     k = ks[idx]

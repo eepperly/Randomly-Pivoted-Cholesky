@@ -15,6 +15,8 @@ import dpp_lra, rpcholesky, unif_sample, leverage_score
 import gallery
 import scipy
 
+np.random.seed(342384230)
+
 n = 10000
 num_trials = 100
 ks = range(0, 160, 10)

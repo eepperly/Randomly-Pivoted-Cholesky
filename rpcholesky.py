@@ -149,7 +149,7 @@ def rejection_cholesky(H):
     L = L[np.ix_(idx,idx)]
     return L, idx
 
-def accelerated_rpcholesky(A, k, b = "auto", stoptol = 1e-13):
+def accelerated_rpcholesky(A, k, b = "auto", stoptol = 1e-13, verbose=False):
     diags = A.diag()
     n = A.shape[0]
     orig_trace = sum(diags)
@@ -215,6 +215,9 @@ def accelerated_rpcholesky(A, k, b = "auto", stoptol = 1e-13):
             G = G[:counter,:]
             rows = rows[:counter,:]
             break
+
+        if verbose:
+            print("Accepted {} / {}".format(num_sel, b))
 
     return PSDLowRank(G, idx = arr_idx, rows = rows)
 

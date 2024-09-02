@@ -4,6 +4,7 @@ import numpy as np
 import scipy as sp
 from lra import PSDLowRank
 from warnings import warn
+from time import time
 
 greedy_lapack = sp.linalg.get_lapack_funcs('pstrf', dtype=np.float64)
 
@@ -148,12 +149,18 @@ def rejection_cholesky(H):
     L = L[np.ix_(idx,idx)]
     return L, idx
 
-def accelerated_rpcholesky(A, k, b = 100, stoptol = 1e-13):
+def accelerated_rpcholesky(A, k, b = "auto", stoptol = 1e-13):
     diags = A.diag()
     n = A.shape[0]
     orig_trace = sum(diags)
     if stoptol is None:
         stoptol = 1e-13
+
+    if "auto" == b:
+        b = int(np.ceil(k / 10))
+        auto_b = True
+    else:
+        auto_b = False
     
     # row ordering
     G = np.zeros((k,n))
@@ -166,6 +173,9 @@ def accelerated_rpcholesky(A, k, b = 100, stoptol = 1e-13):
     while counter < k:
         idx = rng.choice(range(n), size = b, p = diags / sum(diags), replace=True)
 
+        if auto_b:
+            start = time()
+        
         H = A[idx, idx] - G[0:counter,idx].T @ G[0:counter,idx]
         L, accepted = rejection_cholesky(H)
         num_sel = len(accepted)
@@ -177,12 +187,27 @@ def accelerated_rpcholesky(A, k, b = 100, stoptol = 1e-13):
         
         idx = idx[accepted]
 
+        if auto_b:
+            rejection_time = time() - start
+            start = time()
+
         arr_idx[counter:counter+num_sel] = idx
         rows[counter:counter+num_sel,:] = A[idx,:]
         G[counter:counter+num_sel,:] = rows[counter:counter+num_sel,:] - G[0:counter,idx].T @ G[0:counter,:]
         G[counter:counter+num_sel,:] = np.linalg.solve(L, G[counter:counter+num_sel,:])
         diags -= np.sum(G[counter:counter+num_sel,:]**2, axis=0)
         diags = diags.clip(min = 0)
+
+        if auto_b:
+            process_time = time() - start
+
+            # Assuming rejection_time ~ A b^2 and process_time ~ C b
+            # then obtaining rejection_time = process_time / 4 entails
+            # b = C / 4A = (process_time / b) / 4 (rejection_time / b^2)
+            #   = b * process_time / (4 * rejection_time)
+            target = int(np.ceil(b * process_time / (4 * rejection_time)))
+            b = max([min([target, int(np.ceil(1.5*b)), int(np.ceil(k/3))]),
+                     int(np.ceil(b/3)), 10])
 
         counter += num_sel
 

@@ -153,16 +153,17 @@ class KernelMatrix(FunctionMatrix):
     def __init__(self, X, kernel = "gaussian", bandwidth = 1.0, **kwargs):
         super().__init__(X.shape[0],**kwargs)
         if bandwidth == "median":
-            bandwidth = KernelMatrix.median_trick(X, kernel)
+            self.bandwidth = KernelMatrix.median_trick(X, kernel)
         elif bandwidth == "approx_median":
             idx = np.random.choice(X.shape[0], size = min(X.shape[0],1000), replace=False)
-            bandwidth = KernelMatrix.median_trick(X[idx,:], kernel)
+            self.bandwidth = KernelMatrix.median_trick(X[idx,:], kernel)
+        else:
+            self.bandwidth = bandwidth
         self.data = X
-        kernel, kernel_vec, kernel_mtx = KernelMatrix.kernel_from_input(kernel, bandwidth = bandwidth, **kwargs)
+        kernel, kernel_vec, kernel_mtx = KernelMatrix.kernel_from_input(kernel, bandwidth = self.bandwidth, **kwargs)
         self.kernel = kernel
         self.kernel_vec = kernel_vec
-        self.kernel_mtx = kernel_mtx
-        
+        self.kernel_mtx = kernel_mtx        
         
     def _function(self, i, j):
         return self.kernel(self.data[i,:], self.data[j,:])
@@ -172,6 +173,9 @@ class KernelMatrix(FunctionMatrix):
     
     def _function_mtx(self,vec_i,vec_j):
         return self.kernel_mtx(self.data[vec_i,:], self.data[vec_j,:])
+
+    def out_of_sample(self, Xtest, vec):
+        return self.kernel_mtx(Xtest, self.data[vec, :])
 
 class NonsymmetricKernelMatrix(object):
     

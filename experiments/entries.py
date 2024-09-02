@@ -27,7 +27,7 @@ matrices = { "smile" : gallery.smile(n, bandwidth = 2.0),
 methods = { 'DPP' : dpp_lra.dpp_vfx,
             'RLS' : leverage_score.recursive_rls_acc,
             'Uniform' : unif_sample.uniform_sample,
-            'RPCholesky' : rpcholesky.rpcholesky,
+            'RPCholesky' : rpcholesky.simple_rpcholesky,
             'Greedy' : rpcholesky.greedy }
 
 for matrix_name, A in matrices.items():

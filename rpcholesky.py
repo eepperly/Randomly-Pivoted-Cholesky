@@ -193,7 +193,7 @@ def accelerated_rpcholesky(A, k, b = 100, stoptol = 1e-13):
 
     return PSDLowRank(G, idx = arr_idx, rows = rows)
 
-def rpcholesky(A, k, b = None, accelerated = False, **kwargs):
+def rpcholesky(A, k, b = None, accelerated = True, **kwargs):
     if b is None:
         if accelerated:
             return accelerated_rpcholesky(A, k, **kwargs)
@@ -212,6 +212,9 @@ def greedy(A, k, randomized_tiebreaking = False, b = 1, **kwargs):
             warn("Randomized tiebreaking not implemented for block greedy method")
         return block_cholesky_helper(A, k, b, 'greedy', **kwargs)
 
+def simple_rpcholesky(A, k, **kwargs):
+    return rpcholesky(A, k, b = None, accelerated = False, **kwargs)
+    
 def block_rpcholesky(A, k, b = 100, **kwargs):
     return block_cholesky_helper(A, k, b, 'rp', **kwargs)
 

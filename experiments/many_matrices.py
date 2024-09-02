@@ -5,7 +5,7 @@ import os
 import numpy as np
 from scipy.io import loadmat
 from sklearn.preprocessing import StandardScaler
-import dpp_lra, rp_cholesky, unif_sample, leverage_score
+import dpp_lra, rpcholesky, unif_sample, leverage_score
 from utils import approximation_error
 from matrix import KernelMatrix
 
@@ -15,9 +15,9 @@ trials = 10
 
 methods = { 'RLS' : leverage_score.recursive_rls_acc,
             'Uniform' : unif_sample.uniform_sample,
-            'RPChol' : rp_cholesky.rp_cholesky,
-            'Greedy' : rp_cholesky.greedy,
-            'BlockRPChol' : rp_cholesky.block_rp_cholesky }
+            'RPChol' : rpcholesky.simple_rpcholesky,
+            'Greedy' : rpcholesky.greedy,
+            'BlockRPChol' : rpcholesky.block_rpcholesky }
 
 print(" &", " & ".join(methods.keys()), "& $\eta$", end = "")
 for filename in os.listdir(data_folder):

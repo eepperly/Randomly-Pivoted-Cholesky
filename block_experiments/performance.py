@@ -16,8 +16,8 @@ b = int(1.5e2)
 max_items = np.Inf
 trials = 1
 
-methods = { "RPCholesky" : lambda A, k: rpcholesky(A, k),
-            "BlockRPC" : lambda A, k: rpcholesky(A, k, b = b),
+methods = { "RPCholesky" : lambda A, k: simple_rpcholesky(A, k),
+            "BlockRPC" : lambda A, k: rpcholesky(A, k, b = b, accelerated = False),
             "Accelerated" : lambda A, k: rpcholesky(A, k, b = b, accelerated = True) }
 
 stuff_to_save = {**{ f"{name}_time" : [] for name in methods }, **{ f"{name}_error" : [] for name in methods }}

@@ -29,7 +29,7 @@ As = { "smile" : gallery.smile(n, bandwidth = 2.0),
 
 methods = { 'RLS' : recursive_rls_acc,
             'Uniform' : uniform_sample,
-            'RPCholesky' : rpcholesky,
+            'RPCholesky' : simple_rpcholesky,
             'Greedy' : greedy }
 
 for matrix_name, A in As.items():

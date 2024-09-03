@@ -53,6 +53,28 @@ class AbstractPSDMatrix(ABC):
 
     def to_matrix(self):
         return PSDMatrix(self[:,:])
+
+    def _clean_index_input(self, args):
+        idx = args[0]
+        if len(idx) == 1:
+            idx = [idx,idx]
+        else:
+            idx = list(idx)
+            assert len(idx) == 2
+
+        for j in range(2):
+            if isinstance(idx[j], np.ndarray):
+                idx[j] = idx[j].ravel().tolist()
+            elif isinstance(idx[j], slice):
+                idx[j] = list(range(self.shape[0]))[idx[j]]
+            elif isinstance(idx[j], list):
+                pass
+            elif isinstance(idx[j], numbers.Integral):
+                idx[j] = [idx[j]]
+            else:
+                raise RuntimeError("Indexing not implemented with index of type {}".format(type(idx)))
+
+        return idx
         
 class PSDMatrix(AbstractPSDMatrix):
 
@@ -69,8 +91,16 @@ class PSDMatrix(AbstractPSDMatrix):
         return self.matrix[X,X]
 
     def _getitem_helper(self, *args):
-        return self.matrix.__getitem__(*args)
-
+        idx = self._clean_index_input(args)
+        
+        if len(idx[0]) == 1 and len(idx[1]) == 1:
+            return self.matrix[idx[0][0], idx[1][0]]
+        else:
+            mtx = self.matrix[np.ix_(idx[0],idx[1])]
+            if len(idx[0]) == 1: return mtx[0,:]
+            elif len(idx[1]) == 1: return mtx[:,0]
+            else: return mtx
+            
 class FunctionMatrix(AbstractPSDMatrix):
 
     def __init__(self, n, **kwargs):
@@ -97,24 +127,8 @@ class FunctionMatrix(AbstractPSDMatrix):
         return self._function_vec(idx,idx)
     
     def _getitem_helper(self, *args):
-        idx = args[0]
-        if len(idx) == 1:
-            idx = [idx,idx]
-        else:
-            idx = list(idx)
-
-        for j in range(2):
-            if isinstance(idx[j], np.ndarray):
-                idx[j] = idx[j].ravel().tolist()
-            elif isinstance(idx[j], slice):
-                idx[j] = list(range(self.shape[0]))[idx[j]]
-            elif isinstance(idx[j], list):
-                pass
-            elif isinstance(idx[j], numbers.Integral):
-                idx[j] = [idx[j]]
-            else:
-                raise RuntimeError("Indexing not implemented with index of type {}".format(type(idx)))
-
+        idx = self._clean_index_input(args)
+        
         if len(idx[0]) == 1 and len(idx[1]) == 1:
             return self._function(idx[0], idx[1])
         else:

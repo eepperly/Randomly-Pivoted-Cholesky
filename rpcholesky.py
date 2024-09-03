@@ -5,10 +5,14 @@ import scipy as sp
 from lra import PSDLowRank
 from warnings import warn
 from time import time
+from matrix import AbstractPSDMatrix, PSDMatrix
 
 greedy_lapack = sp.linalg.get_lapack_funcs('pstrf', dtype=np.float64)
 
 def cholesky_helper(A, k, alg, stoptol = 0):
+    if not isinstance(A, AbstractPSDMatrix):
+        A = PSDMatrix(A)
+    
     n = A.shape[0]
     diags = A.diag()
     orig_trace = sum(diags)
@@ -59,6 +63,9 @@ def _greedy_cholesky(A, rtol = None, atol = None):
     return L, piv, rank
 
 def block_cholesky_helper(A, k, b, alg, stoptol = 1e-14, strategy = "regularize", rbrp_atol = 0.0, rbrp_rtol = "1/b"):
+    if not isinstance(A, AbstractPSDMatrix):
+        A = PSDMatrix(A)
+    
     diags = A.diag()
     n = A.shape[0]
     orig_trace = sum(diags)
@@ -150,6 +157,9 @@ def rejection_cholesky(H):
     return L, idx
 
 def accelerated_rpcholesky(A, k, b = "auto", stoptol = 1e-13, verbose=False):
+    if not isinstance(A, AbstractPSDMatrix):
+        A = PSDMatrix(A)
+    
     diags = A.diag()
     n = A.shape[0]
     orig_trace = sum(diags)

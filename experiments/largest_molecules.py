@@ -48,7 +48,7 @@ uniform_largest_atom_error = 0.0
 
 methods = { 'Uniform' : unif_sample.uniform_sample,
             'RLS' : leverage_score.recursive_rls_acc,
-            'RPCholesky' : rpcholesky.rpcholesky,
+            'RPCholesky' : rpcholesky.simple_rpcholesky,
             'Greedy' : rpcholesky.greedy }
 
 all_errors = { 'RLS' : [], 'Uniform' : [], 'RPCholesky' : [], 'Greedy' : [] }

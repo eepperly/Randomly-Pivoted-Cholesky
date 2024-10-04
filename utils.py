@@ -8,8 +8,11 @@ def lra_from_sample(A, sample):
     core = rows[:,sample]
     return NystromExtension(core, rows = rows, idx = sample)
 
-def approximation_error(A, lra):
-    return A.trace() - lra.trace()
+def approximation_error(A, lra, relative=False):
+    error = A.trace() - lra.trace()
+    if relative:
+        error /= A.trace()
+    return error
 
 class MatrixWrapper(object):
 

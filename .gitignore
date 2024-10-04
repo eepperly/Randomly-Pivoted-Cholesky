@@ -6,3 +6,6 @@ bless.py
 recursive_nystrom.py
 *~
 *.npz
+*.DS_Store
+block_experiments/datasets/
+*.asv

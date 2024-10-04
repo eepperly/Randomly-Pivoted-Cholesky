@@ -16,7 +16,7 @@ sys.path.append('../')
 from dpp_lra import dpp_cubic
 from unif_sample import uniform_sample
 from leverage_score import recursive_rls_acc
-from rpcholesky import rpcholesky, greedy
+from rpcholesky import simple_rpcholesky, greedy
 
 import numpy as np
 from pdf2image import convert_from_path
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     true_labels[X[:,0] > 0.942] = 1
     true_labels[X[:,1] < 2.73973 * X[:,0] - 4.43836] = 2
     
-    method = rpcholesky
+    method = simple_rpcholesky
     k = 140
 
     lra = method(K, k)

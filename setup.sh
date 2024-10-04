@@ -20,6 +20,10 @@ cd experiments
 mkdir -p data
 mkdir -p figs
 
+cd block_experiments
+mkdir -p data
+mkdir -p figs
+
 # QM9 dataset
 if [ ! -d "molecules" ] 
 then

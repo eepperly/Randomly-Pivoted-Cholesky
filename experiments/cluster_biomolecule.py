@@ -24,7 +24,7 @@ import scipy.linalg as spl
 from itertools import permutations
 from unif_sample import uniform_sample
 from leverage_score import recursive_rls_acc
-from rpcholesky import rpcholesky, greedy
+from rpcholesky import simple_rpcholesky, greedy
 from matrix import KernelMatrix
 
 # pretty plots
@@ -62,7 +62,7 @@ perms = np.array(list(permutations(np.arange(centers)))) # for later index permu
 sigma = .1
 k = 150
 rgreedy = lambda A, k: greedy(A, k, randomized_tiebreaking = True)
-methods = { 'RPCholesky' : rpcholesky,
+methods = { 'RPCholesky' : simple_rpcholesky,
             'Greedy' : rgreedy,
             'RLS' : recursive_rls_acc,
             'Uniform' : uniform_sample }

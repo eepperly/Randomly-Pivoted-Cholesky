@@ -84,7 +84,7 @@ if __name__ == "__main__":
 
     methods = { 'Greedy' : rpcholesky.greedy,
                 'Uniform' : unif_sample.uniform_sample,
-                'RPCholesky' : rpcholesky.rpcholesky,
+                'RPCholesky' : rpcholesky.simple_rpcholesky,
                 'RLS' : leverage_score.recursive_rls_acc,
                 'block50RPCholesky' : partial(rpcholesky.block_rpcholesky,b=50) }
 

@@ -32,7 +32,7 @@ num_trials = 1
 
 methods = { 'RLS' : leverage_score.recursive_rls_acc,
             'Uniform' : unif_sample.uniform_sample,
-            'RPCholesky' : rpcholesky.rpcholesky,
+            'RPCholesky' : rpcholesky.simple_rpcholesky,
             'Greedy' : rpcholesky.greedy,
             'BlockRPCholesky' : rpcholesky.block_rpcholesky,
             'DPP' : dpp_lra.dpp_vfx }

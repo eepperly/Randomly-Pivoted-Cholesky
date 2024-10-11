@@ -57,6 +57,12 @@ class CompactEigenvalueDecomposition(AbstractPSDLowRank):
         U, S, _ = np.linalg.svd(R)
         return CompactEigenvalueDecomposition(Q @ U, S ** 2, **kwargs)
 
+    def evals(self):
+        return self.Lambda
+
+    def evecs(self):
+        return self.V
+
     def trace(self):
         return sum(self.Lambda)
 

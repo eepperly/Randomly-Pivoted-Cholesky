@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 import numbers
 from kernels import MaternKernel, MaternKernel_vec, MaternKernel_mtx, GaussianKernel, GaussianKernel_vec, GaussianKernel_mtx, LaplaceKernel, LaplaceKernel_vec, LaplaceKernel_mtx
 from functools import partial
+from sklearn.metrics.pairwise import euclidean_distances, manhattan_distances
 
 class AbstractPSDMatrix(ABC):
 
@@ -52,6 +53,28 @@ class AbstractPSDMatrix(ABC):
 
     def to_matrix(self):
         return PSDMatrix(self[:,:])
+
+    def _clean_index_input(self, args):
+        idx = args[0]
+        if len(idx) == 1:
+            idx = [idx,idx]
+        else:
+            idx = list(idx)
+            assert len(idx) == 2
+
+        for j in range(2):
+            if isinstance(idx[j], np.ndarray):
+                idx[j] = idx[j].ravel().tolist()
+            elif isinstance(idx[j], slice):
+                idx[j] = list(range(self.shape[0]))[idx[j]]
+            elif isinstance(idx[j], list):
+                pass
+            elif isinstance(idx[j], numbers.Integral):
+                idx[j] = [idx[j]]
+            else:
+                raise RuntimeError("Indexing not implemented with index of type {}".format(type(idx)))
+
+        return idx
         
 class PSDMatrix(AbstractPSDMatrix):
 
@@ -68,8 +91,16 @@ class PSDMatrix(AbstractPSDMatrix):
         return self.matrix[X,X]
 
     def _getitem_helper(self, *args):
-        return self.matrix.__getitem__(*args)
-
+        idx = self._clean_index_input(args)
+        
+        if len(idx[0]) == 1 and len(idx[1]) == 1:
+            return self.matrix[idx[0][0], idx[1][0]]
+        else:
+            mtx = self.matrix[np.ix_(idx[0],idx[1])]
+            if len(idx[0]) == 1: return mtx[0,:]
+            elif len(idx[1]) == 1: return mtx[:,0]
+            else: return mtx
+            
 class FunctionMatrix(AbstractPSDMatrix):
 
     def __init__(self, n, **kwargs):
@@ -96,24 +127,8 @@ class FunctionMatrix(AbstractPSDMatrix):
         return self._function_vec(idx,idx)
     
     def _getitem_helper(self, *args):
-        idx = args[0]
-        if len(idx) == 1:
-            idx = [idx,idx]
-        else:
-            idx = list(idx)
-
-        for j in range(2):
-            if isinstance(idx[j], np.ndarray):
-                idx[j] = idx[j].ravel().tolist()
-            elif isinstance(idx[j], slice):
-                idx[j] = list(range(self.shape[0]))[idx[j]]
-            elif isinstance(idx[j], list):
-                pass
-            elif isinstance(idx[j], numbers.Integral):
-                idx[j] = [idx[j]]
-            else:
-                raise RuntimeError("Indexing not implemented with index of type {}".format(type(idx)))
-
+        idx = self._clean_index_input(args)
+        
         if len(idx[0]) == 1 and len(idx[1]) == 1:
             return self._function(idx[0], idx[1])
         else:
@@ -124,14 +139,25 @@ class FunctionMatrix(AbstractPSDMatrix):
     
 class KernelMatrix(FunctionMatrix):
     @staticmethod
-    def kernel_from_input(kernel, bandwidth = 1.0, **kwargs):
+    def median_trick(X, kernel):
+        if kernel in ["gaussian", "matern"]:
+            dists = euclidean_distances(X,X)
+        elif kernel in "laplace":
+            dists = manhattan_distances(X,X)
+        else:
+            raise RuntimeError(f"Median trick is not implement for kernel {kernel}")
+
+        return np.median(dists)
+            
+    @staticmethod
+    def kernel_from_input(kernel, bandwidth = 1.0, extra_stability = False, **kwargs):
         if isinstance(kernel, str):
             if kernel == 'gaussian':
-                return partial(GaussianKernel,bandwidth=bandwidth), partial(GaussianKernel_vec, bandwidth=bandwidth), partial(GaussianKernel_mtx, bandwidth=bandwidth)
+                return partial(GaussianKernel,bandwidth=bandwidth, extra_stability=extra_stability), partial(GaussianKernel_vec, bandwidth=bandwidth, extra_stability=extra_stability), partial(GaussianKernel_mtx, bandwidth=bandwidth, extra_stability=extra_stability)
             elif kernel == 'matern':
-                return partial(MaternKernel,bandwidth=bandwidth,nu=kwargs["nu"]), partial(MaternKernel_vec,bandwidth=bandwidth,nu=kwargs["nu"]), partial(MaternKernel_mtx,bandwidth=bandwidth,nu=kwargs["nu"])
+                return partial(MaternKernel,bandwidth=bandwidth,nu=kwargs["nu"], extra_stability=extra_stability), partial(MaternKernel_vec,bandwidth=bandwidth,nu=kwargs["nu"], extra_stability=extra_stability), partial(MaternKernel_mtx,bandwidth=bandwidth,nu=kwargs["nu"], extra_stability=extra_stability)
             elif kernel == 'laplace':
-                return partial(LaplaceKernel,bandwidth=bandwidth), partial(LaplaceKernel_vec, bandwidth=bandwidth), partial(LaplaceKernel_mtx, bandwidth=bandwidth)
+                return partial(LaplaceKernel,bandwidth=bandwidth, extra_stability=extra_stability), partial(LaplaceKernel_vec, bandwidth=bandwidth, extra_stability=extra_stability), partial(LaplaceKernel_mtx, bandwidth=bandwidth, extra_stability=extra_stability)
                 
             else:
                 raise RuntimeError("Kernel name {} not recognized".format(kernel))
@@ -140,12 +166,18 @@ class KernelMatrix(FunctionMatrix):
     
     def __init__(self, X, kernel = "gaussian", bandwidth = 1.0, **kwargs):
         super().__init__(X.shape[0],**kwargs)
+        if bandwidth == "median":
+            self.bandwidth = KernelMatrix.median_trick(X, kernel)
+        elif bandwidth == "approx_median":
+            idx = np.random.choice(X.shape[0], size = min(X.shape[0],1000), replace=False)
+            self.bandwidth = KernelMatrix.median_trick(X[idx,:], kernel)
+        else:
+            self.bandwidth = bandwidth
         self.data = X
-        kernel, kernel_vec, kernel_mtx = KernelMatrix.kernel_from_input(kernel, bandwidth = bandwidth, **kwargs)
+        kernel, kernel_vec, kernel_mtx = KernelMatrix.kernel_from_input(kernel, bandwidth = self.bandwidth, **kwargs)
         self.kernel = kernel
         self.kernel_vec = kernel_vec
-        self.kernel_mtx = kernel_mtx
-        
+        self.kernel_mtx = kernel_mtx        
         
     def _function(self, i, j):
         return self.kernel(self.data[i,:], self.data[j,:])
@@ -155,6 +187,9 @@ class KernelMatrix(FunctionMatrix):
     
     def _function_mtx(self,vec_i,vec_j):
         return self.kernel_mtx(self.data[vec_i,:], self.data[vec_j,:])
+
+    def out_of_sample(self, Xtest, vec):
+        return self.kernel_mtx(Xtest, self.data[vec, :])
 
 class NonsymmetricKernelMatrix(object):
     

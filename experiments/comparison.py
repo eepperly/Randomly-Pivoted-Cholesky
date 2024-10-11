@@ -27,7 +27,7 @@ ks = range(10, 160, 10)
 methods = { 'DPP' : dpp_lra.dpp_cubic,
             'RLS' : leverage_score.recursive_rls_acc,
             'Uniform' : unif_sample.uniform_sample,
-            'RPCholesky' : rpcholesky.rpcholesky,
+            'RPCholesky' : rpcholesky.simple_rpcholesky,
             'Greedy' : rpcholesky.greedy }
 
 num_trials = 100

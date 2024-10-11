@@ -1,17 +1,39 @@
 # Randomly Pivoted Cholesky
 
-This contains code to reproduce the numerical experiments for [_Randomly pivoted Cholesky: Practical approximation of a kernel matrix with few entry evaluations_](https://arxiv.org/abs/2207.06503) by [Yifan Chen](https://yifanc96.github.io), [Ethan N. Epperly](https://www.ethanepperly.com), [Joel A. Tropp](https://tropp.caltech.edu), and [Robert J. Webber](https://rwebber.people.caltech.edu).
+This contains code to reproduce the numerical experiments for [_Randomly pivoted Cholesky: Practical approximation of a kernel matrix with few entry evaluations_](https://arxiv.org/abs/2207.06503) by [Yifan Chen](https://yifanc96.github.io), [Ethan N. Epperly](https://www.ethanepperly.com), [Joel A. Tropp](https://tropp.caltech.edu), and [Robert J. Webber](https://rwebber.people.caltech.edu) and the forthcoming paper [_Embrace rejection: Kernel matrix approximation by accelerated randomly pivoted Cholesky_] by [Ethan N. Epperly](https://www.ethanepperly.com), [Joel A. Tropp](https://tropp.caltech.edu), and [Robert J. Webber](https://rwebber.people.caltech.edu).
+
+## Citing this Repository
+
+If you use our code in your work, please cite the following BibTeX entries:
+
+```bibtex
+@article{chen2023randomly,
+  title={Randomly pivoted Cholesky: {Practical} approximation of a kernel matrix with few entry evaluations},
+  author={Yifan Chen and Ethan N. Epperly and Joel A. Tropp and Robert J. Webber},
+  journal={arXiv preprint arXiv:2207.06503},
+  url = {https://arxiv.org/abs/2207.06503},
+  year={2023}
+}
+
+@article{epperly2024embrace,
+  title={Embrace rejection: {Kernel} matrix approximation by accelerated randomly pivoted {Cholesky}},
+  author={Ethan N. Epperly and Joel A. Tropp and Robert J. Webber},
+  journal={Manuscript in preparation},
+  year={2024}
+}
+```
 
 ## Algorithm
 
-Randomly pivoted Cholesky (RPCholesky) computes a low-rank approximation to a positive semidefinite matrix $\boldsymbol{A}$.
+Randomly pivoted Cholesky (RPCholesky) is a fast, randomized algorithm for computing a low-rank approximation to a positive semidefinite matrix $\boldsymbol{A}$ (i.e., a symmetric matrix with nonnegative eigenvalues).
 We anticipate the algorithm is most useful for [kernel](https://en.wikipedia.org/wiki/Kernel_method) and [Gaussian process](https://en.wikipedia.org/wiki/Kriging) methods, where the matrix $\boldsymbol{A}$ is defined only implicitly by a [_kernel function_](https://en.wikipedia.org/wiki/Positive-definite_kernel) which must be evaluated at great expense to read each entry of $\boldsymbol{A}$.
 The result of the algorithm is a rank $k$ [(column) Nyström approximation](https://en.wikipedia.org/wiki/Low-rank_matrix_approximations#Nyström_approximation) $\boldsymbol{\hat{A}} = \boldsymbol{F}\boldsymbol{F}^*$ to the matrix $\boldsymbol{A}$, computed in $\mathcal{O}(k^2N)$ operations and only $(k+1)N$ entry evaluations of the matrix $\boldsymbol{A}$.
 In our experience, RPCholesky consistently provides approximations of comparable accuracy to [other](https://proceedings.neurips.cc/paper/2017/hash/a03fa30821986dff10fc66647c84c9c3-Abstract.html) [methods](https://jmlr.org/papers/v20/19-179.html) with fewer entry evaluations.
+By default, this paper uses the faster _accelerated RPCholesky_ method, developed in followup work.
+Accelerated RPCholesky method produces the exact same random output as ordinary RPCholesky, but is faster.
 
 ## Using RPCholesky
 
-While the main purpose of these scripts is for scientific reproducibility, they also may be useful for using RPCholesky in an application.
 RPCholesky is implemented in the `rpcholesky` method in `rpcholesky.py`, and can be called as
 
 ```
@@ -30,12 +52,12 @@ From this object, one can obtain $\boldsymbol{F}$ (defining the Nyström approxi
 
 ```
 nystrom_approximation = rpcholesky(A, num_pivots)
-F      = nystrom_approximation.F                    # Nystrom approximation is F @ F.T
-pivots = nystrom_approximation.idx 
-rows   = nystrom.rows                               # rows = A[pivots, :]
+F      = nystrom_approximation.get_left_factor()    # Nystrom approximation is F @ F.T
+pivots = nystrom_approximation.get_indices() 
+rows   = nystrom_approximation.get_rows()           # rows = A[pivots, :]
 ```
 
-## Running the experiments
+## Running the experiments for the original RPCholesky paper
 
 The first step to reproducing the experiments from the manuscript is to run the script
 
@@ -56,3 +78,7 @@ The data from the figures in the paper can produced by running the following scr
 Once the relevant Python scripts have been run, the figures from the paper can be generated from the relevant MATLAB scripts in `experiments/matlab_plotting/`.
 
 Figure 4 in the manuscript was completely changed in revision. Figure 4 from [earlier versions of the manuscript](https://arxiv.org/abs/2207.06503v3) can be generated using the scripts `experiments/cluster_letters.py` and `experiments/cluster_letters_plot.py`.
+
+## Running the experiments for the accelerated RPCholesky paper
+
+The experiments for the accelerated RPCholesky paper are found in the folder `block_experiments/`.

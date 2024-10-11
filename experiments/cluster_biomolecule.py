@@ -147,8 +147,10 @@ accuracies = []
 k_range = np.arange(10, k_max + 1, 10)
 
 for name, method in methods.items():
+    print(name)
     method_accuracy = np.zeros((iterations, len(k_range)))
     for j in range(iterations):
+        print("Iteration {}".format(j))
         for k_idx, k in zip(range(len(k_range)), k_range):
 
             # dense eigensolver

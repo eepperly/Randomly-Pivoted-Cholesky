@@ -125,14 +125,14 @@ class NystromExtension(AbstractPSDLowRank):
     def get_factor(self):
         if self.G is None:
             L = np.linalg.cholesky(self.C+np.trace(self.C)*np.finfo(float).eps*np.identity(self.C.shape[0]))
-            self.G = np.linalg.solve(L, self.rows) 
+            self.G = np.linalg.solve(L, self.rows)
         return self.G
 
     def get_left_factor(self):
-        return self.get_factor()
+        return self.get_factor().T
 
     def get_right_factor(self):
-        return self.get_left_factor().T
+        return self.get_factor()
         
     def trace(self):
         return np.linalg.norm(self.get_factor())**2

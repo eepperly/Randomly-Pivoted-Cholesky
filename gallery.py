@@ -54,9 +54,9 @@ def expspiral(N, rate=1e-3, rotate_rate=5e-3, power = 1.5, bandwidth = 0.02):
     t = np.array(range(N))
     X[:,0] = np.exp(-rate * N * (t/N) ** power) * np.cos(rotate_rate * t)
     X[:,1] = np.exp(-rate * N * (t/N) ** power) * np.sin(rotate_rate * t)
-    return KernelMatrix(X, bandwidth = bandwidth)
+    return KernelMatrix(X, bandwidth = bandwidth, **kwargs)
 
-def robspiral(N):
+def robspiral(N, **kwargs):
     times = np.linspace(0, 2, N)
     times = times ** 6
     times = times[::-1]
@@ -64,9 +64,9 @@ def robspiral(N):
     y = np.exp(.2 * times) * np.sin(times)
     X = np.column_stack((x,y))
     bandwidth = 1000
-    return KernelMatrix(X, bandwidth = bandwidth)
+    return KernelMatrix(X, bandwidth = bandwidth, **kwargs)
 
-def powerspiral(N, max_radius = 1.0, angle = 0.2, decay_power = 1, bandwidth = 1e-3):
+def powerspiral(N, max_radius = 1.0, angle = 0.2, decay_power = 1, bandwidth = 1e-3, **kwargs):
     X = np.zeros((N, 2))
     t = np.array(range(1,N+1), dtype=float)
     radii = max_radius * t ** (-decay_power)
@@ -74,12 +74,12 @@ def powerspiral(N, max_radius = 1.0, angle = 0.2, decay_power = 1, bandwidth = 1
     X[:,0] = radii * np.cos(angles)
     X[:,1] = radii * np.sin(angles)
     # np.random.shuffle(X)
-    return KernelMatrix(X, bandwidth = bandwidth)
+    return KernelMatrix(X, bandwidth = bandwidth, **kwargs)
 
-def outliers(N, num_outliers = 50):
+def outliers(N, num_outliers = 50, **kwargs):
     X = 0.5*np.random.randn(N, 20)/np.sqrt(20.0)
     X[np.random.choice(range(N), size = num_outliers, replace = False),:] += 100.0 * np.random.randn(num_outliers, 20)
-    return KernelMatrix(X)
+    return KernelMatrix(X, **kwargs)
 
 def random_kernel_matrix(N, d = 10, **kwargs):
     X = np.random.randn(N, d)

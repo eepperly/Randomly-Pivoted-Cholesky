@@ -86,6 +86,26 @@ nystrom_approximation = rpcholesky(A, k, b = block_size, accelerated = False)
 nystrom_approximation = rpcholesky(A, k, accelerated = False)
 ```
 
+## Running the experiments for the accelerated RPCholesky paper
+
+The first step to reproducing the experiments from the manuscript is to run the script
+
+```
+./setup.sh
+```
+
+which sets up the file structure.
+The experiments for the accelerated RPCholesky paper are found in the folder `block_experiments/`.
+The relevant files are described below:
+
+1. `block_experiments/block_generation.py`: tests the runtime of generating columns of Gaussian and Laplace kernel matrices for different block sizes. Used to produce Figure 1.
+2. `block_experiments/test_accelerated.py`: provides an initial comparison of accelerated, block, and simple RPCholesky on a synthetic matrix. Used to produce Figure 2.
+3. `block_experiments/performance.py`: tests accelerated, block, and simple RPCholesky on a large bed of examples. Used to produce Figure 3.
+4. `block_experiments/pes_code.py`: evaluates accelerated RPCholesky and alternatives for computation of potential energy surfaces. Used to produce the experiments in section 3.2.
+5. `block_experiments/compare_rbrp.py`: compares accelerated RPCholesky, block RPCholesky, and RBRP Cholesky. Used to form the table in the appendix.
+
+Once the relevant Python scripts have been run, the figures from the paper can be generated from the relevant MATLAB scripts in `experiments/matlab_plotting/`.
+
 ## Running the experiments for the original RPCholesky paper
 
 The first step to reproducing the experiments from the manuscript is to run the script
@@ -107,7 +127,3 @@ The data from the figures in the paper can produced by running the following scr
 Once the relevant Python scripts have been run, the figures from the paper can be generated from the relevant MATLAB scripts in `experiments/matlab_plotting/`.
 
 Figure 4 in the manuscript was completely changed in revision. Figure 4 from [earlier versions of the manuscript](https://arxiv.org/abs/2207.06503v3) can be generated using the scripts `experiments/cluster_letters.py` and `experiments/cluster_letters_plot.py`.
-
-## Running the experiments for the accelerated RPCholesky paper
-
-The experiments for the accelerated RPCholesky paper are found in the folder `block_experiments/`.

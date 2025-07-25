@@ -1,19 +1,24 @@
 # Randomly Pivoted Cholesky
 
-This contains code to reproduce the numerical experiments for [_Randomly pivoted Cholesky: Practical approximation of a kernel matrix with few entry evaluations_](https://arxiv.org/abs/2207.06503) by [Yifan Chen](https://yifanc96.github.io), [Ethan N. Epperly](https://www.ethanepperly.com), [Joel A. Tropp](https://tropp.caltech.edu), and [Robert J. Webber](https://rwebber.people.caltech.edu) and the forthcoming paper [_Embrace rejection: Kernel matrix approximation by accelerated randomly pivoted Cholesky_] by [Ethan N. Epperly](https://www.ethanepperly.com), [Joel A. Tropp](https://tropp.caltech.edu), and [Robert J. Webber](https://rwebber.people.caltech.edu).
+This contains code to reproduce the numerical experiments for [_Randomly pivoted Cholesky: Practical approximation of a kernel matrix with few entry evaluations_](https://doi.org/10.1002/cpa.22234) by [Yifan Chen](https://yifanc96.github.io), [Ethan N. Epperly](https://www.ethanepperly.com), [Joel A. Tropp](https://tropp.caltech.edu), and [Robert J. Webber](https://rwebber.people.caltech.edu) and [_Embrace rejection: Kernel matrix approximation by accelerated randomly pivoted Cholesky_](https://arxiv.org/abs/2410.03969) by [Ethan N. Epperly](https://www.ethanepperly.com), [Joel A. Tropp](https://tropp.caltech.edu), and [Robert J. Webber](https://rwebber.people.caltech.edu).
 
 ## Citing this Repository
 
 If you use our code in your work, please cite the following BibTeX entries:
 
 ```bibtex
-@article{chen2023randomly,
-  title={Randomly pivoted Cholesky: {Practical} approximation of a kernel matrix with few entry evaluations},
-  author={Yifan Chen and Ethan N. Epperly and Joel A. Tropp and Robert J. Webber},
-  journal={arXiv preprint arXiv:2207.06503},
-  url = {https://arxiv.org/abs/2207.06503},
-  year={2023}
+@article{chen2025randomly,
+  title = {Randomly Pivoted {Cholesky}: {Practical} Approximation of a Kernel Matrix with Few Entry Evaluations},
+  author = {Chen, Yifan and Epperly, Ethan N. and Tropp, Joel A. and Webber, Robert J.},
+  year = {2025},
+  journal = {Communications on Pure and Applied Mathematics},
+  volume = {78},
+  number = {5},
+  pages = {995--1041},
+  issn = {1097-0312},
+  doi = {10.1002/cpa.22234},
 }
+
 
 @article{epperly2024embrace,
   title={Embrace rejection: {Kernel} matrix approximation by accelerated randomly pivoted {Cholesky}},
@@ -23,7 +28,7 @@ If you use our code in your work, please cite the following BibTeX entries:
 }
 ```
 
-## Algorithm
+## The RPCholesky Algorithm
 
 Randomly pivoted Cholesky (RPCholesky) is a fast, randomized algorithm for computing a low-rank approximation to a positive semidefinite matrix $\boldsymbol{A}$ (i.e., a symmetric matrix with nonnegative eigenvalues).
 We anticipate the algorithm is most useful for [kernel](https://en.wikipedia.org/wiki/Kernel_method) and [Gaussian process](https://en.wikipedia.org/wiki/Kriging) methods, where the matrix $\boldsymbol{A}$ is defined only implicitly by a [_kernel function_](https://en.wikipedia.org/wiki/Positive-definite_kernel) which must be evaluated at great expense to read each entry of $\boldsymbol{A}$.
@@ -55,6 +60,30 @@ nystrom_approximation = rpcholesky(A, num_pivots)
 F      = nystrom_approximation.get_left_factor()    # Nystrom approximation is F @ F.T
 pivots = nystrom_approximation.get_indices() 
 rows   = nystrom_approximation.get_rows()           # rows = A[pivots, :]
+```
+
+## Simple, block, and accelerated RPCholesky
+
+This repository contains implementations of three versions of the RPCholesky algorithm.
+
+1. Our recommended algorithm is accelerated RPCholesky. This algorithm produces the same random distribution of outputs as simple RPCholesky, but uses a faster, rejection-sampling based design. This is our default RPCholesky algorithm. To compute a rank-$k$ approximation, one can use the invocation:
+```python
+nystrom_approximation = rpcholesky(A, k)
+```
+The accelerated RPCholesky algorithm has an optional block size option, which can be set as follows:
+```python
+nystrom_approximation = rpcholesky(A, k, b = block_size)
+```
+The accelerated RPCholesky method can also be called using the dedicated function `accelerated_rpcholesky`.
+
+2. Block RPCholesky is anothter faster, blocked RPCholesky algorithm. We generally recommend accelerated RPCholesky over it, as block RPCholesky can produce less accurate approximations on certain problems. Block RPCholesky can be invoked using the `block_rpcholesky` function or using `rpcholesky` with a specified block size and the `accelerated` flag set to `False`:
+```python
+nystrom_approximation = rpcholesky(A, k, b = block_size, accelerated = False)
+```
+
+3. Simple RPCholesky is the basic, unaccelerated version of RPCholesky. We generally recommend against its use because it is slower than accelerated RPCholesky. It can be invoked using the `simple_rpcholesky` function or by calling `rpcholesky` with the `accelerated` flag set to `False`:
+```python
+nystrom_approximation = rpcholesky(A, k, accelerated = False)
 ```
 
 ## Running the experiments for the original RPCholesky paper

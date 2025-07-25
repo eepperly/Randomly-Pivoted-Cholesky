@@ -53,4 +53,7 @@ for item, info in enumerate(gallery(N, datafolder=os.path.join(os.getcwd(),"data
         stuff_to_save[f"{name}_error"].append(error_ratio)
         print(f"{item}\t{name}\t{total_time}\t{error_ratio}")
 
+    import os
+    os.makedirs("data", exist_ok=True)
+    
     savemat("data/performance.mat", stuff_to_save)

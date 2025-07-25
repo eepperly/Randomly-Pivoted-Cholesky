@@ -310,14 +310,21 @@ def recursiveNystrom(X, n_components: int, kernel_func=kernel, random_state=None
 # ============
 
 # Load data
-# data = np.load('md17_aspirin.npz')
-# data = np.load('md17_benzene2017.npz')
-# data = np.load('md17_ethanol.npz')
-# data = np.load('md17_malonaldehyde.npz')
-# data = np.load('md17_naphthalene.npz')
-# data = np.load('md17_salicylic.npz')
-# data = np.load('md17_toluene.npz')
-data = np.load('md17_uracil.npz')
+# data = np.load('data/md17_aspirin.npz')
+# data = np.load('data/md17_benzene2017.npz')
+# data = np.load('data/md17_ethanol.npz')
+# data = np.load('data/md17_malonaldehyde.npz')
+# data = np.load('data/md17_naphthalene.npz')
+# data = np.load('data/md17_salicylic.npz')
+# data = np.load('data/md17_toluene.npz')
+try:
+    data = np.load('data/md17_uracil.npz')
+except FileNotFoundError:
+    raise FileNotFoundError(
+        "Could not find 'data/md17_uracil.npz'. "
+        "You can download it from http://quantum-machine.org/gdml/data/npz/md17_uracil.npz "
+        "and place it in the 'data/' directory."
+    )
 R = data['R']
 E = data['E']
 del data

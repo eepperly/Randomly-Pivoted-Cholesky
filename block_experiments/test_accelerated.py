@@ -3,7 +3,7 @@
 import sys
 sys.path.append('../')
 
-from rpcholesky import rpcholesky
+from rpcholesky import rpcholesky, simple_rpcholesky
 from gallery import smile, expspiral, outliers
 from matrix import KernelMatrix
 from time import time
@@ -37,5 +37,8 @@ for idx in range(len(ks)):
             
         print("{}\t{}\t{}\t{}".format(k, method_name, np.mean(times[method_name][idx,:]), np.mean(errs[method_name][idx,:])))
     print()
-
+    
+    import os
+    os.makedirs("data", exist_ok=True)
+    
     sp.io.savemat("data/initial_compare.mat", {**{"{}_times".format(method) : times[method] for method in methods}, **{"{}_errs".format(method) : errs[method] for method in methods}, "X" : A.data} )

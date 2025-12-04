@@ -19,9 +19,6 @@ class AbstractPSDLowRank(ABC):
     def __matmul__(self, other):
         pass
 
-    def __rmatmul__(self, other):
-        return (self @ other.T).T
-
     @abstractmethod
     def rank(self):
         pass
@@ -67,13 +64,13 @@ class CompactEigenvalueDecomposition(AbstractPSDLowRank):
         return sum(self.Lambda)
 
     def __matmul__(self, other):
-        return self.V @ (self.Lambda * (self.V.T @ other))
+        return self.V @ (self.Lambda[:,np.newaxis] * (self.V.T @ other))
 
     def rank(self):
-        return len(S)
+        return len(self.Lambda)
 
     def matrix(self):
-        return self.V @ (self.Lambda * self.V.T)
+        return self.V @ (self.Lambda[:,np.newaxis] * self.V.T)
 
     def eigenvalue_decomposition(self):
         return self
@@ -120,19 +117,30 @@ class PSDLowRank(AbstractPSDLowRank):
 
 class NystromExtension(AbstractPSDLowRank):
 
-    def __init__(self, core, factor = None, **kwargs):
+    def __init__(self, core, factor = None, interpolation = None, **kwargs):
         super().__init__(**kwargs)
         if "rows" not in kwargs:
             raise RuntimeError("Need to specify rows for Nystrom extension")
         self.C = (core+core.T)/2
         self.shape = (self.rows.shape[1], self.rows.shape[1])
+        self.L = None
         self.G = factor
+        self.W = interpolation
+
+    def get_core_factor(self):
+        if self.L is None:
+            self.L = np.linalg.cholesky(self.C+np.trace(self.C)*np.finfo(float).eps*np.identity(self.C.shape[0]))
+        return self.L
 
     def get_factor(self):
         if self.G is None:
-            L = np.linalg.cholesky(self.C+np.trace(self.C)*np.finfo(float).eps*np.identity(self.C.shape[0]))
-            self.G = np.linalg.solve(L, self.rows)
+            self.G = np.linalg.solve(self.get_core_factor(), self.rows)
         return self.G
+
+    def get_interpolation(self):
+        if self.W is None:
+            self.W = np.linalg.solve(self.get_core_factor().T, self.get_left_factor())
+        return self.W
 
     def get_left_factor(self):
         return self.get_factor().T
@@ -144,16 +152,20 @@ class NystromExtension(AbstractPSDLowRank):
         return np.linalg.norm(self.get_factor())**2
 
     def __matmul__(self, other):
-        return self.rows.T @ np.linalg.solve(self.C, self.rows @ other)
+        return self.get_left_factor() @ (self.get_right_factor() @ other)
 
     def rank(self):
         return self.C.shape[0]
 
     def matrix(self):
-        return self.rows.T @ np.linalg.solve(self.C, self.rows)
+        return self.get_left_factor() @ self.get_right_factor()
     
     def eigenvalue_decomposition(self):
         return CompactEigenvalueDecomposition.from_G(self.get_factor(), idx = self.idx, rows = self.rows)
 
     def scale(self, scaling):
-        return NystromExtension(self.C, idx = self.idx, rows = self.rows * scaling[np.newaxis,:])
+        if not (self.G is None):
+            G = self.G * np.sqrt(scaling[np.newaxis,:])
+        else:
+            G = None
+        return NystromExtension(self.C, idx = self.idx, rows = self.rows * scaling[np.newaxis,:], factor = G, interpolation = self.W)

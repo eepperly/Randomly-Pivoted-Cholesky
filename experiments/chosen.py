@@ -13,7 +13,7 @@ sys.path.append('../')
 import numpy as np
 import gallery
 import scipy
-from rpcholesky import rpcholesky, greedy
+from rpcholesky import simple_rpcholesky, greedy
 from unif_sample import uniform_sample
 from leverage_score import recursive_rls_acc
 from utils import approximation_error

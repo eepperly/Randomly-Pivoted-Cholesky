@@ -166,6 +166,8 @@ class KernelMatrix(FunctionMatrix):
     
     def __init__(self, X, kernel = "gaussian", bandwidth = 1.0, **kwargs):
         super().__init__(X.shape[0],**kwargs)
+        if "shuffle_data" in kwargs and kwargs["shuffle_data"]:
+            np.random.shuffle(X)
         if bandwidth == "median":
             self.bandwidth = KernelMatrix.median_trick(X, kernel)
         elif bandwidth == "approx_median":

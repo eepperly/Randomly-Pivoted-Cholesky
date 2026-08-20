@@ -21,7 +21,7 @@ np.random.seed(2940938240)
 
 n = 10000
 As = { "smile" : gallery.smile(n, bandwidth = 2.0),
-       "spiral" : gallery.robspiral(n) }
+       "spiral" : gallery.robspiral(n, shuffle_data=True) }
 ks = range(10, 160, 10)
 
 methods = { 'DPP' : dpp_lra.dpp_cubic,

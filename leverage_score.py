@@ -13,7 +13,7 @@ class RecursiveNystromWrapper(object):
 
     def __call__(self, X, Y = None):
         if Y is None:
-            to_return = self.A.diag(X)
+            to_return = self.A.diag(X.ravel())
             return np.reshape(to_return, (to_return.shape[0], 1))
         else:
             to_return = self.A[np.ix_(X.ravel(), Y.ravel())]

@@ -1,45 +1,60 @@
 #!/bin/sh
 
+# Run this script from the root directory of the repository
+set -e
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$ROOT"
+
+# Download a file with either wget or curl
+fetch () { # usage: fetch URL OUTPUT_FILE
+    if command -v wget > /dev/null
+    then
+        wget -O "$2" "$1"
+    else
+        curl -L -o "$2" "$1"
+    fi
+}
+
 # RLS samplers
 if [ ! -f "recursive_nystrom.py" ] 
 then
-    wget https://raw.githubusercontent.com/axelv/recursive-nystrom/master/recursive_nystrom.py
+    fetch https://raw.githubusercontent.com/axelv/recursive-nystrom/master/recursive_nystrom.py recursive_nystrom.py
 fi
 
 if [ ! -f "bless.py" ] 
 then
-    wget https://raw.githubusercontent.com/LCSL/bless/master/bless.py
+    fetch https://raw.githubusercontent.com/LCSL/bless/master/bless.py bless.py
 fi
 
 # Python packages
-pip3 install qml
-pip3 install dppy
+pip3 install -r requirements.txt
 
-# Data and figure folder
-cd experiments
+# Data and figure folders
 mkdir -p data
-mkdir -p figs
-
-cd block_experiments
-mkdir -p data
-mkdir -p figs
+mkdir -p experiments/data experiments/figs
+mkdir -p block_experiments/data block_experiments/figs
 
 # QM9 dataset
+cd "$ROOT/experiments"
 if [ ! -d "molecules" ] 
 then
-    wget https://figshare.com/ndownloader/files/3195389
+    fetch https://figshare.com/ndownloader/files/3195389 3195389
     mkdir -p molecules
-    cd molecules
-    mv ../3195389 .
-    tar -xvf 3195389
+    tar -xf 3195389 -C molecules
     rm 3195389
-    cd ..
 fi
 
 # Alanine dipeptide
-wget http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-3x250ns-heavy-atom-positions.npz
-wget http://ftp.imp.fu-berlin.de/pub/cmb-data/alanine-dipeptide-3x250ns-backbone-dihedrals.npz
-cd ..
+for f in alanine-dipeptide-3x250ns-heavy-atom-positions.npz alanine-dipeptide-3x250ns-backbone-dihedrals.npz
+do
+    if [ ! -f "$f" ]
+    then
+        fetch http://ftp.imp.fu-berlin.de/pub/cmb-data/$f $f
+    fi
+done
 
-# Download data
-python download_data.py
+# Datasets for the experiments on many matrices
+# (stored in data/preprocessed/ and used by experiments/many_matrices.py
+# and block_experiments/performance.py)
+cd "$ROOT"
+python3 download_data.py

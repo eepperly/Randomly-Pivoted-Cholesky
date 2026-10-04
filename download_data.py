@@ -56,8 +56,11 @@ def decompress_file(filepath):
 # CONSTANTS
 
 seed = 926
-raw_data_directory = "data/raw/"
-mat_data_directory = "data/preprocessed/"
+root_directory = os.path.dirname(os.path.abspath(__file__))
+raw_data_directory = os.path.join(root_directory, "data", "raw") + os.sep
+mat_data_directory = os.path.join(root_directory, "data", "preprocessed") + os.sep
+os.makedirs(raw_data_directory, exist_ok=True)
+os.makedirs(mat_data_directory, exist_ok=True)
 
 # DATASETS
 # We download a superset of the datasets we use in the experiments. We decided to drop some of these because
@@ -245,7 +248,7 @@ for k, data in datasets_openml.items():
     # Remove unwanted features, e.g., IDs.     
     if "remove_features" in data:
         for feature in data["remove_features"]:
-            idx = np.where(np.array(attr) == data["remove_features"])[0][0]
+            idx = np.where(np.array(attr) == feature)[0][0]
             X = np.delete(X, idx, 1)
 
     if "test_proportion" in data:        

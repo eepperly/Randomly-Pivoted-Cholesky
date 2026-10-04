@@ -39,7 +39,7 @@ for matrix_name, A in As.items():
         print(name)
         
         trace_norm_errors = np.zeros((len(ks), num_trials))
-        trace_norm_errors[:] = np.NaN
+        trace_norm_errors[:] = np.nan
         
         for k, idx in zip(ks, range(len(ks))):
             try:

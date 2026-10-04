@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 
 import os, sys
-from dppy.finite_dpps import FiniteDPP
 import numpy as np
+
+# dppy still uses aliases (np.float, np.int, ...) that were removed in numpy 1.24
+for _name, _type in [("float", float), ("int", int), ("bool", bool), ("complex", complex), ("object", object)]:
+    if _name not in vars(np):
+        setattr(np, _name, _type)
+
+from dppy.finite_dpps import FiniteDPP
 from utils import lra_from_sample, MatrixWrapper
 
 def dpp_sample_helper(A, k, **params):
@@ -17,14 +23,19 @@ def dpp_sample_helper(A, k, **params):
         else:
             A.dpp_stuff = (FiniteDPP('likelihood', False, L = A[:,:]), k)
 
+    # Suppress dppy's progress output on stderr, restoring it even if sampling fails
+    original_stderr = sys.stderr
     sys.stderr = open(os.devnull, 'w')
-    if mode == 'mcmc':
-        sample = A.dpp_stuff[0].sample_mcmc_k_dpp(k)
-    elif mode == 'alpha':
-        sample = A.dpp_stuff[0].sample_exact_k_dpp(k, mode=mode, early_stop=True)
-    else:
-        sample = A.dpp_stuff[0].sample_exact_k_dpp(k, mode=mode)
-    sys.stderr = sys.__stderr__
+    try:
+        if mode == 'mcmc':
+            sample = A.dpp_stuff[0].sample_mcmc_k_dpp(k)
+        elif mode == 'alpha':
+            sample = A.dpp_stuff[0].sample_exact_k_dpp(k, mode=mode, early_stop=True)
+        else:
+            sample = A.dpp_stuff[0].sample_exact_k_dpp(k, mode=mode)
+    finally:
+        sys.stderr.close()
+        sys.stderr = original_stderr
 
     return lra_from_sample(A, sample)
         

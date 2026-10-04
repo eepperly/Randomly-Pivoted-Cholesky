@@ -43,8 +43,8 @@ def cholesky_helper(A, k, alg, stoptol = 0):
         diags = diags.clip(min = 0)
 
         if stoptol > 0 and sum(diags) <= stoptol * orig_trace:
-            G = G[:i,:]
-            rows = rows[:i,:]
+            G = G[:i+1,:]
+            rows = rows[:i+1,:]
             break
 
     return PSDLowRank(G, idx = arr_idx, rows = rows)
@@ -224,6 +224,7 @@ def accelerated_rpcholesky(A, k, b = "auto", stoptol = 1e-13, verbose=False):
         if stoptol > 0 and sum(diags) <= stoptol * orig_trace:
             G = G[:counter,:]
             rows = rows[:counter,:]
+            arr_idx = arr_idx[:counter]
             break
 
         if verbose:
@@ -256,5 +257,5 @@ def simple_rpcholesky(A, k, **kwargs):
 def block_rpcholesky(A, k, b = 100, **kwargs):
     return block_cholesky_helper(A, k, b, 'rp', **kwargs)
 
-def block_greedy(A, k, b = 100, stoptol = None):
+def block_greedy(A, k, b = 100, **kwargs):
     return block_cholesky_helper(A, k, b, 'greedy', **kwargs)

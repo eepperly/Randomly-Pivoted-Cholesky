@@ -60,7 +60,7 @@ class KRR_Nystrom():
     def predict_Nystrom(self, Xts):
         ts = time.time()
         K_pred = NonsymmetricKernelMatrix(Xts, self.Xtr[self.sample_idx,:], kernel = self.kernel, bandwidth = self.bandwidth)
-        preds = KtM @ self.sol
+        preds = K_pred[:,:] @ self.sol
         te = time.time()
         self.pred_time = te - ts
         return preds

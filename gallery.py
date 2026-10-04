@@ -49,7 +49,7 @@ def smile(N, bandwidth = 2.0, **kwargs):
 
     return KernelMatrix(X, bandwidth = bandwidth, **kwargs)    
 
-def expspiral(N, rate=1e-3, rotate_rate=5e-3, power = 1.5, bandwidth = 0.02):
+def expspiral(N, rate=1e-3, rotate_rate=5e-3, power = 1.5, bandwidth = 0.02, **kwargs):
     X = np.zeros((N, 2))
     t = np.array(range(N))
     X[:,0] = np.exp(-rate * N * (t/N) ** power) * np.cos(rotate_rate * t)

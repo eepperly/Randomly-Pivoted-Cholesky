@@ -5,7 +5,7 @@ sys.path.append('../')
 
 import numpy as np
 from gallery import gallery
-from rpcholesky import rpcholesky
+from rpcholesky import rpcholesky, simple_rpcholesky
 from time import time
 from scipy.io import savemat
 import os
@@ -13,7 +13,7 @@ import os
 N = int(1e5)
 k = int(1e3)
 b = int(1.5e2)
-max_items = np.Inf
+max_items = np.inf
 trials = 1
 
 methods = { "RPCholesky" : lambda A, k: simple_rpcholesky(A, k),
@@ -22,7 +22,7 @@ methods = { "RPCholesky" : lambda A, k: simple_rpcholesky(A, k),
 
 stuff_to_save = {**{ f"{name}_time" : [] for name in methods }, **{ f"{name}_error" : [] for name in methods }}
 
-for item, info in enumerate(gallery(N, datafolder=os.path.join(os.getcwd(),"datasets"), min_N=N/10)):
+for item, info in enumerate(gallery(N, datafolder=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "preprocessed"), min_N=N/10)):
     if item >= max_items:
         break
     matname, A = info

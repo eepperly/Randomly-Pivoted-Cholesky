@@ -60,7 +60,7 @@ for name, method in methods.items():
 
                 accuracies[idx, i] = normalized_mutual_info_score(true_labels, kmeans.labels_)
             except np.linalg.LinAlgError:
-                accuracies[idx, i] = np.NaN
+                accuracies[idx, i] = np.nan
             print("   ", accuracies[idx,i])
         print("  Mean:", np.mean(accuracies[idx,:]))
 

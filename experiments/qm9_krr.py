@@ -13,32 +13,65 @@ with 'matlab_plotting/make_krr_plots.m'
 import sys
 sys.path.append('../')
 
-import qml, os
+import os
 from scipy.io import savemat, loadmat
 import numpy as np
 
-def get_molecules(directory = "molecules/", max_atoms = 29, max_mols = np.Inf, output_index = 7):
-    compounds = []
+NUCLEAR_CHARGES = {"H" : 1, "C" : 6, "N" : 7, "O" : 8, "F" : 9}
+
+def coulomb_matrix(charges, coords, size):
+    '''
+    Coulomb matrix of a molecule, padded with zeros to 'size' atoms,
+    with rows and columns sorted by decreasing row norm. The lower triangle
+    is returned as a vector.
+    '''
+    n = len(charges)
+    dists = np.linalg.norm(coords[:,np.newaxis,:] - coords[np.newaxis,:,:], axis=-1)
+    np.fill_diagonal(dists, 1.0)
+    M = np.outer(charges, charges) / dists
+    np.fill_diagonal(M, 0.5 * charges ** 2.4)
+    M_padded = np.zeros((size, size))
+    M_padded[:n,:n] = M
+    order = np.argsort(-np.linalg.norm(M_padded, axis=1), kind="stable")
+    M_padded = M_padded[np.ix_(order, order)]
+    return M_padded[np.tril_indices(size)]
+
+def read_xyz(filename):
+    with open(filename) as myfile:
+        lines = myfile.readlines()
+    n = int(lines[0])
+    elements = []
+    coords = np.zeros((n,3))
+    for i in range(n):
+        fields = lines[2+i].split()
+        elements.append(fields[0])
+        coords[i,:] = [float(x) for x in fields[1:4]]
+    charges = np.array([NUCLEAR_CHARGES[e] for e in elements], dtype=float)
+    return charges, coords, lines[1]
+
+def get_molecules(directory = "molecules/", max_atoms = 29, max_mols = np.inf, output_index = 7):
+    representations = []
     energies = []
-    for f in sorted(os.listdir("molecules/")):
-        if len(compounds) >= max_mols:
+    for f in sorted(os.listdir(directory)):
+        if len(representations) >= max_mols:
             break
+        if not f.endswith(".xyz"):
+            continue
 
         try:
-            mol = qml.Compound(xyz="molecules/"+f)
-            mol.generate_coulomb_matrix(size=max_atoms, sorting="row-norm")
-            with open("molecules/"+f) as myfile:
-                line = list(myfile.readlines())[1]
-                energies.append(float(line.split()[output_index]) * 27.2114) # Hartrees to eV
-            compounds.append(mol)
-        except ValueError:
-            pass
+            charges, coords, properties = read_xyz(os.path.join(directory, f))
+            representations.append(coulomb_matrix(charges, coords, max_atoms))
+            energies.append(float(properties.split()[output_index]) * 27.2114) # Hartrees to eV
+        except (ValueError, KeyError):
+            # A few files use Mathematica-style exponents (e.g., 1.0*^-6) that cannot be parsed
+            if len(representations) > len(energies):
+                representations.pop()
     
-    c = list(zip(compounds, energies))
+    c = list(zip(representations, energies))
     np.random.shuffle(c)
-    compounds, energies = zip(*c)
+    representations, energies = zip(*c)
 
-    X = np.array([mol.representation for mol in compounds])
+    X = np.array(representations)
     Y = np.array(energies).reshape((X.shape[0],1))
 
     return X, Y 
@@ -118,7 +151,7 @@ if __name__ == "__main__":
                     while True:
                         try:
                             print(f"Trial {i}")
-                            model = KRR_Nystrom(kernel = "gaussian", 
+                            model = KRR_Nystrom(kernel = "laplace", 
                                     bandwidth = sigma)
                             model.fit_Nystrom(train_sample, train_sample_target, lamb = lamb, sample_num = k, sample_method = method, solve_method = solve_method)
                             preds = model.predict_Nystrom(test_sample)

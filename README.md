@@ -86,35 +86,33 @@ nystrom_approximation = rpcholesky(A, k, b = block_size, accelerated = False)
 nystrom_approximation = rpcholesky(A, k, accelerated = False)
 ```
 
-## Running the experiments for the accelerated RPCholesky paper
+## Setup for running the experiments
 
-The first step to reproducing the experiments from the manuscript is to run the script
+The first step to reproducing the experiments from either manuscript is to run the script (from the root directory of the repository)
 
 ```
 ./setup.sh
 ```
 
-which sets up the file structure.
+which installs the Python dependencies listed in `requirements.txt`, sets up the file structure, downloads the RLS samplers, and downloads the datasets used in the experiments (the QM9 dataset, the alanine dipeptide dataset, and the LIBSVM/OpenML datasets, which are stored in `data/preprocessed/` by `download_data.py`).
+The experiment scripts should be run from within the folder they are located in (e.g., `cd experiments; python comparison.py`).
+The scripts `experiments/cluster_letters.py` and `experiments/cluster_letters_plot.py` additionally require [poppler](https://poppler.freedesktop.org) for `pdf2image` (e.g., `brew install poppler`).
+
+## Running the experiments for the accelerated RPCholesky paper
+
 The experiments for the accelerated RPCholesky paper are found in the folder `block_experiments/`.
 The relevant files are described below:
 
 1. `block_experiments/block_generation.py`: tests the runtime of generating columns of Gaussian and Laplace kernel matrices for different block sizes. Used to produce Figure 1.
 2. `block_experiments/test_accelerated.py`: provides an initial comparison of accelerated, block, and simple RPCholesky on a synthetic matrix. Used to produce Figure 2.
-3. `block_experiments/performance.py`: tests accelerated, block, and simple RPCholesky on a large bed of examples. Used to produce Figure 3.
-4. `block_experiments/pes_code.py`: evaluates accelerated RPCholesky and alternatives for computation of potential energy surfaces. Used to produce the experiments in section 3.2.
+3. `block_experiments/performance.py`: tests accelerated, block, and simple RPCholesky on a large bed of examples (including the real datasets in `data/preprocessed/`). Used to produce Figure 3.
+4. `block_experiments/pes_code.py`: evaluates accelerated RPCholesky and alternatives for computation of potential energy surfaces. Used to produce the experiments in section 3.2. Requires the [MD17 datasets](http://quantum-machine.org/gdml/#datasets) in `block_experiments/data/`; run as `python pes_code.py <molecule>` for each of the eight molecules (the plots are produced after the last one).
 5. `block_experiments/compare_rbrp.py`: compares accelerated RPCholesky, block RPCholesky, and RBRP Cholesky. Used to form the table in the appendix.
 
-Once the relevant Python scripts have been run, the figures from the paper can be generated from the relevant MATLAB scripts in `experiments/matlab_plotting/`.
+Once the relevant Python scripts have been run, the figures from the paper can be generated from the relevant MATLAB scripts in `block_experiments/matlab_plotting/`.
 
 ## Running the experiments for the original RPCholesky paper
 
-The first step to reproducing the experiments from the manuscript is to run the script
-
-```
-./setup.sh
-```
-
-which sets up the file structure, loads RLS and DPP samplers, and downloads the QM9 dataset for the KRR example.
 The data from the figures in the paper can produced by running the following scripts in the `experiments/` folder, each of which has instructions for its individual use at a comment at the top:
 
 1. `experiments/comparison.py`: compares the approximation error for different Nyström methods. Used to produce the left displays in Figure 1.
@@ -123,6 +121,8 @@ The data from the figures in the paper can produced by running the following scr
 4. `experiments/qm9_krr.py`: performs kernel ridge regression on the QM9 dataset. Used to produce Figure 3.
 5. `experiments/cluster_biomolecule.py`: performs spectral clustering on the [alanine dipeptide dataset](https://markovmodel.github.io/mdshare/ALA2/). Used to produce Figure 4.
 6. `experiments/timing.py`: compares the timing of different Nyström methods.
+7. `experiments/many_matrices.py`: compares the approximation error of different Nyström methods on a bed of real datasets (from `data/preprocessed/`).
+8. `experiments/largest_molecules.py`: evaluates different Nyström methods on the largest molecules in QM9 (run `qm9_krr.py` first).
 
 Once the relevant Python scripts have been run, the figures from the paper can be generated from the relevant MATLAB scripts in `experiments/matlab_plotting/`.
 

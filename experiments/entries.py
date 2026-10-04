@@ -50,7 +50,7 @@ for matrix_name, A in matrices.items():
             except ValueError:
                 print("    error!")
                 A.reset()
-                queries[idx,:] = np.NaN
+                queries[idx,:] = np.nan
 
             output = {"queries" : queries}
             scipy.io.savemat("data/{}_{}_queries.mat".format(matrix_name,name),output)

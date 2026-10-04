@@ -34,8 +34,7 @@ for quality_idx = 1:length(qualities)
     saveas(gcf,sprintf('../figs/initial_%s.fig',quality))
 end
 
-load('../data/points.mat')
-
+% The data points X are stored in initial_compare.mat
 figure(3)
 markersize = 40;
 alpha = 0.04;

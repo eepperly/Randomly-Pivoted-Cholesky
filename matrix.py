@@ -142,7 +142,7 @@ class KernelMatrix(FunctionMatrix):
     def median_trick(X, kernel):
         if kernel in ["gaussian", "matern"]:
             dists = euclidean_distances(X,X)
-        elif kernel in "laplace":
+        elif kernel == "laplace":
             dists = manhattan_distances(X,X)
         else:
             raise RuntimeError(f"Median trick is not implement for kernel {kernel}")
@@ -182,7 +182,7 @@ class KernelMatrix(FunctionMatrix):
         self.kernel_mtx = kernel_mtx        
         
     def _function(self, i, j):
-        return self.kernel(self.data[i,:], self.data[j,:])
+        return self.kernel(self.data[i[0],:], self.data[j[0],:])
     
     def _function_vec(self,vec_i,vec_j):
         return self.kernel_vec(self.data[vec_i,:], self.data[vec_j,:])
@@ -202,7 +202,7 @@ class NonsymmetricKernelMatrix(object):
         self.kernel, self.kernel_vec, self.kernel_mtx = KernelMatrix.kernel_from_input(kernel, bandwidth = bandwidth, **kwargs)
         
     def _function(self, i, j):
-        return self.kernel(self.X[i,:], self.Y[j,:])
+        return self.kernel(self.X[i[0],:], self.Y[j[0],:])
     
     def _function_vec(self,vec_i,vec_j):
         return self.kernel_vec(self.X[vec_i,:], self.Y[vec_j,:])

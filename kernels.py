@@ -26,7 +26,7 @@ def GaussianKernel(x,y,bandwidth=1.0,**kwargs):
 
 def GaussianKernel_vec(vec_x,vec_y, bandwidth=1.0,**kwargs):
     # for vec_x, vec_y in R^{n*d}, return n values
-    dsts = np.linalg.norm(vec_x-vec_y, axis = -1)**2
+    dsts = np.linalg.norm(vec_x-vec_y, axis = -1)
     return np.exp(-0.5*dsts**2/bandwidth**2)
 
 def GaussianKernel_mtx(xx,yy,bandwidth=1.0,extra_stability=False):
@@ -68,11 +68,11 @@ def MaternKernel_vec(vec_x,vec_y,bandwidth=1.0, nu=0.5,**kwargs):
         sqrt2nu = np.sqrt(2.0*nu)
         return 1.0/(gamma(nu) * 2.0**(nu-1)) * (sqrt2nu * d) ** nu * kv(nu, sqrt2nu * d)
 
-def MaternKernel_mtx(xx,yy,bandwidth,nu,extra_stability=False):
+def MaternKernel_mtx(xx,yy,bandwidth=1.0,nu=0.5,extra_stability=False):
     # xx in R^{nx*d} and yy in R^{ny*d} are both collection of points (two axis)
     # return nx*ny values
     if extra_stability:
-        d = np.linalg.norm(xx[:, None, :] - yy[None, :, :], axis=-1)
+        d = np.linalg.norm(xx[:, None, :] - yy[None, :, :], axis=-1)/bandwidth
     else:
         d = euclidean_distances(xx,yy)/bandwidth # faster
     if nu == 0.5:

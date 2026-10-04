@@ -4,6 +4,14 @@
 # This code was written by Robert J. Webber, and uses
 # a different implementation of RPCholesky methods then
 # the rest of this paper
+#
+# Usage: python pes_code.py [molecule]
+# where molecule is one of uracil (default), toluene, salicylic,
+# naphthalene, malonaldehyde, ethanol, benzene, aspirin. The MD17
+# dataset for the molecule must be stored in 'data/' (see below).
+# Results are saved to '<molecule>2.npz'. Once the results for all
+# eight molecules have been computed, running this script
+# additionally produces the plots from the paper.
 
 # =====
 # SETUP
@@ -12,6 +20,8 @@
 # import libraries
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+import sys
 import time
 from scipy.linalg import solve_triangular
 from scipy.linalg import eigvalsh
@@ -269,7 +279,7 @@ def recursiveNystrom(X, n_components: int, kernel_func=kernel, random_state=None
             # eigenvalues equal roughly the number of points per cluster, maybe this should scale with n?
             # can be interpret as the zoom level
             lmbda = (np.sum(np.diag(SKS) * (weights ** 2))
-                    - np.sum(eigvalsh(SKS * weights[:,None] * weights[None,:], eigvals=(SKS.shape[0]-k, SKS.shape[0]-1))))/k
+                    - np.sum(eigvalsh(SKS * weights[:,None] * weights[None,:], subset_by_index=(SKS.shape[0]-k, SKS.shape[0]-1))))/k
         lmbda = np.maximum(lmbda_0 * SKS.shape[0], lmbda)
         if lmbda == lmbda_0 * SKS.shape[0]:
             print("Set lambda to %d." % lmbda)
@@ -310,19 +320,24 @@ def recursiveNystrom(X, n_components: int, kernel_func=kernel, random_state=None
 # ============
 
 # Load data
-# data = np.load('data/md17_aspirin.npz')
-# data = np.load('data/md17_benzene2017.npz')
-# data = np.load('data/md17_ethanol.npz')
-# data = np.load('data/md17_malonaldehyde.npz')
-# data = np.load('data/md17_naphthalene.npz')
-# data = np.load('data/md17_salicylic.npz')
-# data = np.load('data/md17_toluene.npz')
+molecule_files = { 'uracil' : 'md17_uracil.npz',
+                   'toluene' : 'md17_toluene.npz',
+                   'salicylic' : 'md17_salicylic.npz',
+                   'naphthalene' : 'md17_naphthalene.npz',
+                   'malonaldehyde' : 'md17_malonaldehyde.npz',
+                   'ethanol' : 'md17_ethanol.npz',
+                   'benzene' : 'md17_benzene2017.npz',
+                   'aspirin' : 'md17_aspirin.npz' }
+molecule = sys.argv[1] if len(sys.argv) > 1 else 'uracil'
+if molecule not in molecule_files:
+    raise ValueError(f"Unknown molecule '{molecule}'. Choose from {list(molecule_files)}")
+datafile = os.path.join('data', molecule_files[molecule])
 try:
-    data = np.load('data/md17_uracil.npz')
+    data = np.load(datafile)
 except FileNotFoundError:
     raise FileNotFoundError(
-        "Could not find 'data/md17_uracil.npz'. "
-        "You can download it from http://quantum-machine.org/gdml/data/npz/md17_uracil.npz "
+        f"Could not find '{datafile}'. "
+        f"You can download it from http://quantum-machine.org/gdml/data/npz/{molecule_files[molecule]} "
         "and place it in the 'data/' directory."
     )
 R = data['R']
@@ -407,7 +422,7 @@ resid = np.zeros((methods, max_iters + 1))
 mae = np.zeros((methods, max_iters + 1))
 rmse = np.zeros((methods, max_iters + 1))
 times = np.zeros((methods, max_iters + 1))
-for j in range(4, methods):
+for j in range(methods):
     np.random.seed(43)
     if j == 0:
         # RPC Nystrom
@@ -524,15 +539,16 @@ for j in range(4, methods):
         print('RMSE:', rmse[j, t])
  
 # close kernel matrix
-# np.savez('aspirin2.npz', prep, times, resid, mae, rmse)
-# np.savez('benzene2.npz', prep, times, resid, mae, rmse)
-# np.savez('ethanol2.npz', prep, times, resid, mae, rmse)
-# np.savez('malonaldehyde2.npz', prep, times, resid, mae, rmse)
-# np.savez('naphthalene2.npz', prep, times, resid, mae, rmse)
-# np.savez('salicylic2.npz', prep, times, resid, mae, rmse)
-# np.savez('toluene2.npz', prep, times, resid, mae, rmse)
-np.savez('uracil2.npz', prep, times, resid, mae, rmse)
+np.savez(f'{molecule}2.npz', prep, times, resid, mae, rmse)
 h5f_A.close()
+os.remove('kernel_mat.h5')
+
+# only plot once the results for all molecules are available
+if not all(os.path.exists(f) for f in ['uracil2.npz', 'toluene2.npz', 'salicylic2.npz',
+                                        'naphthalene2.npz', 'malonaldehyde2.npz',
+                                        'ethanol2.npz', 'benzene2.npz', 'aspirin2.npz']):
+    print('Results saved. Run this script for every molecule to generate the plots.')
+    sys.exit(0)
 
 #%%
 

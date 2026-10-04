@@ -1,5 +1,15 @@
 #!/usr/bin/env python3
 
+'''
+Code to compare the approximation error of different Nystrom
+methods on a bed of real datasets, printing the results as rows
+of a LaTeX table. The datasets must first be downloaded by running
+'download_data.py' in the root directory of the repository.
+'''
+
+import sys
+sys.path.append('../')
+
 from scipy.sparse import issparse
 import os
 import numpy as np
@@ -9,7 +19,7 @@ import dpp_lra, rpcholesky, unif_sample, leverage_score
 from utils import approximation_error
 from matrix import KernelMatrix
 
-data_folder = os.path.join(os.getcwd(), "data/preprocessed")
+data_folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "preprocessed")
 scaler = StandardScaler()
 trials = 10
 
@@ -19,7 +29,7 @@ methods = { 'RLS' : leverage_score.recursive_rls_acc,
             'Greedy' : rpcholesky.greedy,
             'BlockRPChol' : rpcholesky.block_rpcholesky }
 
-print(" &", " & ".join(methods.keys()), "& $\eta$", end = "")
+print(" &", " & ".join(methods.keys()), "& $\\eta$", end = "")
 for filename in os.listdir(data_folder):
     print(" \\\\")
     print(filename[:-4].ljust(15), end="")

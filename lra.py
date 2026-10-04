@@ -46,7 +46,7 @@ class CompactEigenvalueDecomposition(AbstractPSDLowRank):
         super().__init__(**kwargs)
         self.V = V
         self.Lambda = Lambda
-        self.shape = (self.V[0], self.V[0])
+        self.shape = (self.V.shape[0], self.V.shape[0])
 
     @staticmethod
     def from_G(G, **kwargs):

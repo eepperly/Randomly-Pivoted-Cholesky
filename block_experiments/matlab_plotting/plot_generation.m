@@ -4,7 +4,7 @@ close all
 markers = {'o','*','s','^'};
 colors = {'#648FFF','#785EF0','#DC267F','#FE6100'};
 
-data = {gaussian, l1laplace};
+data = {gaussian, laplace};
 names = {'$\ell_2$ Gaussian', '$\ell_1$ Laplace'};
 fnames = {'generation_gaussian','generation_l1laplace'};
 
